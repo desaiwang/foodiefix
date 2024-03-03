@@ -20,18 +20,178 @@
       display: flex;
       flex-direction: column;
     }
+
+    /* below are all styling for the range slider */
+    .range_container {
+      display: flex;
+      flex-direction: column;
+      width: 80%;
+      margin: 100px auto;
+    }
+
+    .sliders_control {
+      position: relative;
+      min-height: 30px;
+    }
+
+    .form_control {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #635a5a;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      pointer-events: all;
+      width: 12px;
+      height: 12px;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px #C6C6C6;
+      cursor: pointer;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      -webkit-appearance: none;
+      pointer-events: all;
+      width: 12px;
+      height: 12px;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px #C6C6C6;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      background: #f7f7f7;
+    }
+
+    input[type=range]::-webkit-slider-thumb:active {
+      box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+      -webkit-box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+    }
+
+    input[type="number"] {
+      color: #8a8383;
+      width: 50px;
+      height: 30px;
+      font-size: 20px;
+      border: none;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 2px;
+      width: 100%;
+      position: absolute;
+      background-color: #C6C6C6;
+      pointer-events: none;
+    }
+
+    #fromSlider {
+      height: 0;
+      z-index: 1;
+    }
   </style>
 
 </head>
 <div class="row">
   <svg id="svgMap" width="600" height="600"></svg>
-  <div class="column">
+  <div class="column" style="margin: 10px;">
+    <div id="controlfilter"></div>
 
+    <!-- slider adapted from https://codepen.io/predragdavidovic/pen/mdpMoWo -->
+    <div class="range_container">
+      <div class="sliders_control">
+        <input id="fromSlider" type="range" value="3.5" min="3.5" max="5" step="0.5" />
+        <input id="toSlider" type="range" value="5" min="3.5" max="5" step="0.5" />
+      </div>
+      <div class="form_control">
+        <div class="form_control_container">
+          <div class="form_control_container__time">Min</div>
+          <text class="form_control_container__time__input" id="fromInput">3.5</text>
+        </div>
+        <div class="form_control_container">
+          <div class="form_control_container__time">Max</div>
+          <text class="form_control_container__time__input" id="toInput">5</text>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <body>
 
+  <script>
+
+    function controlFromSlider(fromSlider, toSlider, fromInput) {
+      console.log("from slider  moved");
+      const [from, to] = [fromSlider.value, toSlider.value];
+      fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+      if (from > to) {
+        fromSlider.value = to;
+        fromInput.text(to);
+      } else {
+        fromInput.value = from;
+        fromInput.text(from);
+      }
+    }
+
+    function controlToSlider(fromSlider, toSlider, toInput) {
+      const [from, to] = [fromSlider.value, toSlider.value];
+      fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+      setToggleAccessible(toSlider);
+      if (from <= to) {
+        toSlider.value = to;
+        toInput.text(to);
+      } else {
+        toInput.value = from;
+        toInput.text(from);
+      }
+    }
+
+    function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
+      const rangeDistance = to.max - to.min;
+      const fromPosition = from.value - to.min;
+      const toPosition = to.value - to.min;
+      controlSlider.style.background = `linear-gradient(
+      to right,
+      ${sliderColor} 0%,
+      ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
+      ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
+      ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
+      ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
+      ${sliderColor} 100%)`;
+    }
+
+    function setToggleAccessible(currentTarget) {
+      const toSlider = document.querySelector('#toSlider');
+      if (Number(currentTarget.value) <= 0) {
+        toSlider.style.zIndex = 2;
+      } else {
+        toSlider.style.zIndex = 0;
+      }
+    }
+
+    const fromSlider = document.querySelector('#fromSlider');
+    const toSlider = document.querySelector('#toSlider');
+    const fromInput = d3.select('#fromInput');
+    const toInput = d3.select('#toInput');
+    fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+    setToggleAccessible(toSlider);
+
+    fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
+    toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
+
+  </script>
   <script id="map">
     const svgMap = d3.select("#svgMap");
     const width = svgMap.attr("width");
@@ -45,7 +205,8 @@
     const requestMapData = async () => {
 
       //eatery data
-      const eateries = await d3.csv("./yelp_boston.csv", d3.autoType);
+      const eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
+      let eateries = eateriesAll; //this is used for filtering
       console.log(eateries)
 
 
@@ -103,19 +264,22 @@
         .attr("x", 10)
         .attr("y", 25);
 
+      let svgEateries = svgMap.append("g");
       //circles that represent eateries
-      let circles = svgMap.append("g").selectAll("circle.eateries").data(eateries)
+      let circles = svgEateries.selectAll("circle.eateries").data(eateries)
         .join("circle")
         .attr("class", "eateries")
         .attr("r", 3)
         .attr("fill", "#ff3e03")
         .attr("opacity", 0.9)
+        .attr("transform", (d) => {
+          `translate(${projection([d.longitude, d.latitude])})`
+        })
         .on("mouseover", (event) => {
           tooltip.style("visibility", "visible");
 
 
           let eatery = event.target.__data__
-          console.log(event);
 
           //dynamically adjusts width, delete later
           tooltipWidth = eatery['name'].length * 10
@@ -134,12 +298,6 @@
         .on("mouseout", (event) => {
           tooltip.style("visibility", "hidden");
         });
-
-      circles.attr("transform", (d) => {
-        `translate(${projection([d.longitude, d.latitude])})`
-      });
-
-
 
 
       var zoom = d3.zoom()
@@ -182,9 +340,162 @@
         circles
           .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`);
       };
+
+      //from INFO3300 notes, makes brush histogram filter
+
+      var filters = {};
+
+      function pointPassesFilters(point) {
+
+        let stillPassed = true;
+
+        Object.values(filters).forEach(filterFunc => {
+
+          stillPassed = filterFunc(point) && stillPassed;
+
+        });
+
+        return stillPassed;
+
+      }
+
+      //calls update on filters
+      function updateData() {
+
+        // Filter the points using the filter dictionary first
+        eateries = eateriesAll.filter(d => pointPassesFilters(d));
+
+        console.log('filtered eateries', eateries);
+        console.log(projection([]));
+        // Draw the circles
+        svgEateries.selectAll("circle.eateries").data(eateries)
+          .join("circle")
+          .attr("class", "eateries")
+          .attr("r", 3)
+          .attr("fill", "#ff3e03")
+          .attr("opacity", 0.9)
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .attr("transform", (d) => {
+            `translate(${projection([d.longitude, d.latitude])})`
+          });
+      }
+
+
+      function makeSlider(container, label, attribute, sliderWidth, sliderHeight) {
+
+        // Get a raw array of values for this property
+        let values = eateries.map(d => d[attribute]);
+
+
+        // Find min and max for some scales
+        let minMax = d3.extent(values);
+        console.log(minMax);
+        let xScale = d3.scaleLinear().domain(minMax)
+          .range([10, sliderWidth - 10]); // padding here for ease
+        let xAxis = d3.axisBottom(xScale).tickFormat(d3.format(""));
+
+
+        // Create some HTML elements
+        let wrapper = container.append("div").attr("class", "controls");
+        wrapper.append("div").text(label);
+        let canvas = wrapper.append("svg").attr("width", sliderWidth)
+          .attr("height", sliderHeight + 20)
+          .attr("attribute", attribute);
+        canvas.append("g").attr("transform", `translate(0,${sliderHeight})`)
+          .call(xAxis);
+
+        // Make an area chart
+        let areaLayer = canvas.append("g");
+
+        // Built-in d3 helper function to count up data
+        let numBins = 10;
+
+        // Program a histogram generator to count up data into "bins"
+        let histoGen = d3.histogram().domain(minMax)
+          .thresholds(numBins);
+        let counts = histoGen(values);
+
+        // add dummy object at start of graph
+        counts.unshift({
+          x0: 0,
+          x1: counts[0].x0,
+          length: counts[0].length
+        });
+
+        let yScale = d3.scaleLinear().domain(d3.extent(counts, d => d.length))
+          .range([sliderHeight, 4]);
+
+        // Area generator is like a lineGen, but we give y0 and y1 to fill it in
+        let area = d3.area().x(d => xScale(d.x1))
+          .y0(yScale(0))
+          .y1(d => yScale(d.length))
+          .curve(d3.curveNatural);
+
+        // Adding the path works just like a line (the area generator just makes a filled region)
+        areaLayer.append("path").datum(counts)
+          .attr("class", "area")
+          .attr("fill", "#ff3e03") //Color
+          .attr("d", area);
+
+
+        let filterFunc = d => true;
+        filters[attribute] = filterFunc;
+
+        var brush = d3.brushX().extent([[10, 0],                           // Upper left corner
+        [sliderWidth - 10, sliderHeight]])  // Lower right corner
+          .on("brush end", brushMoved);
+        // NOTE: we still need to *call the brush* towards the end of our code to "paste" it into HTML
+
+        function brushMoved(event) {
+
+          console.log(event.type, event.selection);
+
+          // Everything but clicking on brush area
+          if (event.selection !== null) {
+
+            // Run scales in reverse to get data values for the ends of the brush
+            //  If a scale turns data -> pixels, then scale.invert turns pixels -> data
+            let start = xScale.invert(event.selection[0]);
+            let end = xScale.invert(event.selection[1]);
+
+            // Overwrite old filter in our dictionary
+            // This filter now only returns True if the point's value is between start and end
+            let filterFunc = d => d[attribute] >= start && d[attribute] <= end;
+            console.log(filterFunc);
+            filters[attribute] = filterFunc;
+            console.log(filters[attribute]);
+
+
+            updateData();
+            console.log(eateries);
+
+          }
+          // Clicking on brush area to empty it out
+          else {
+            // Selected nothing, let everything pass
+            let filterFunc = d => true;
+            filters[attribute] = filterFunc;
+
+            updateData();
+            console.log(eateries);
+
+          }
+
+        }
+        canvas.append("g").attr("class", "brush").call(brush);
+      }
+
+      let controls = d3.select("#controlfilter");
+      makeSlider(controls, "# of Reviews", "review_count", 250, 20);
+
     }
 
     requestMapData();
+
+
+
+
 
     function getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
       var R = 3963; // Radius of the earth in miles
