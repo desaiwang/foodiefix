@@ -1,0 +1,208 @@
+<html>
+
+<head>
+  <title>INFO 4310 - HW2</title>
+  <!-- TODO-C: temp styles from old assignment, feel free to update -->
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet" type="text/css">
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-tile@1"></script>
+  <style>
+    .row {
+      display: flex;
+      flex-direction: row;
+      justify-content: center
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+
+</head>
+<div class="row">
+  <svg id="svgMap" width="600" height="600"></svg>
+  <div class="column">
+
+  </div>
+</div>
+
+<body>
+
+  <script id="map">
+    const svgMap = d3.select("#svgMap");
+    const width = svgMap.attr("width");
+    const height = svgMap.attr("height");
+    const deltas = [-100, -4, -1, 0];
+
+    let url = (x, y, z) =>
+      `https://api.mapbox.com/styles/v1/desaiwang/ckttxzrvq0s4i18l4he5vtltt/tiles/${z}/${x}/${y}${devicePixelRatio > 1 ? "@2x" : ""}?access_token=pk.eyJ1IjoiZGVzYWl3YW5nIiwiYSI6ImNrc2puMHIyaTJmbWsydG41bmljMWExdjIifQ.A4w7M2K7sSIN-uLuXarl_w`
+
+
+    const requestMapData = async () => {
+
+      //eatery data
+      const eateries = await d3.csv("./yelp_boston.csv", d3.autoType);
+      console.log(eateries)
+
+
+      // //this is the amount of times buses stop at station per week
+      // const frequencyExtentTransit = d3.extent(eateries, d => d['weekly_stop_counts']);
+      // const frequencyScaleTransit = d3.scaleLog().domain(frequencyExtentTransit).range([2.5, 15]);
+
+
+
+      const projection = d3.geoMercator()
+        .scale(1 / (2 * Math.PI))
+        .translate([0, 0]);
+
+
+      const render = d3.geoPath(projection);
+
+      const tile = d3.tile()
+        .extent([[0, 0], [width, height]])
+        .tileSize(512)
+        .clampX(false);
+
+      const levels = svgMap.append("g")
+        .attr("pointer-events", "none")
+        .selectAll("g")
+        .data(deltas)
+        .join("g")
+        .style("opacity", null); //set to 0.3 to see low resolution files
+
+      //Mouseover interaction
+      let tooltipWidth = 250;
+      let tooltipHeight = 45;
+
+      let tooltip = svgMap.append("g")
+        .attr("class", "tooltip")
+        .attr("transform", `translate(${20},20)`)
+        .attr("visibility", "hidden");
+
+      let box = tooltip.append("rect")
+        .attr("fill", "white")
+        .attr("opacity", 0.8)
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("height", tooltipHeight);
+
+      let txt = tooltip.append("text")
+        .attr("fill", "black")
+        // .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 10)
+        .attr("y", 5);
+      let txt2 = tooltip.append("text")
+        .attr("fill", "black")
+        // .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 10)
+        .attr("y", 25);
+
+      //circles that represent eateries
+      let circles = svgMap.append("g").selectAll("circle.eateries").data(eateries)
+        .join("circle")
+        .attr("class", "eateries")
+        .attr("r", 3)
+        .attr("fill", "#ff3e03")
+        .attr("opacity", 0.9)
+        .on("mouseover", (event) => {
+          tooltip.style("visibility", "visible");
+
+
+          let eatery = event.target.__data__
+          console.log(event);
+
+          //dynamically adjusts width, delete later
+          tooltipWidth = eatery['name'].length * 10
+          if (tooltipWidth < 100) { tooltipWidth = 120; }
+
+
+          box.attr("width", tooltipWidth)
+
+          txt.text(eatery['name']);
+          txt2.text(`Rating: ${eatery['rating']}`)
+
+          tooltip
+            .raise();
+
+        })
+        .on("mouseout", (event) => {
+          tooltip.style("visibility", "hidden");
+        });
+
+      circles.attr("transform", (d) => {
+        `translate(${projection([d.longitude, d.latitude])})`
+      });
+
+
+
+
+      var zoom = d3.zoom()
+        .scaleExtent([1 << 18.5, 1 << 25])
+        .on("zoom", ({ transform }) => zoomed(transform));
+
+      svgMap
+        .call(zoom)
+        .call(zoom.transform, d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(- 1 << 19)
+          .translate(...projection([-71.073, 42.348]))
+          .scale(-1)
+        )
+        .on("mousewheel.zoom", null)
+        .on("DOMMouseScroll.zoom", null); //disable scrolling while zooming
+
+
+      function zoomed(transform) {
+
+        levels.each(function (delta) {
+          const tiles = tile.zoomDelta(delta)(transform);
+
+          d3.select(this)
+            .selectAll("image")
+            .data(tiles, d => d)
+            .join("image")
+            .attr("xlink:href", d => url(...d3.tileWrap(d)))
+            .attr("x", ([x]) => (x + tiles.translate[0]) * tiles.scale)
+            .attr("y", ([, y]) => (y + tiles.translate[1]) * tiles.scale)
+            .attr("width", tiles.scale)
+            .attr("height", tiles.scale);
+        });
+
+
+        projection
+          .scale(transform.k / (2 * Math.PI))
+          .translate([transform.x, transform.y]);
+
+        circles
+          .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`);
+      };
+    }
+
+    requestMapData();
+
+    function getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
+      var R = 3963; // Radius of the earth in miles
+      var dLat = deg2rad(lat2 - lat1);
+      var dLon = deg2rad(lon2 - lon1);
+      var a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      var d = R * c;
+      return d;
+    }
+
+    function deg2rad(deg) {
+      return deg * (Math.PI / 180)
+    }
+
+  </script>
+</body>
