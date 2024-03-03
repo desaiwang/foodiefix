@@ -104,7 +104,14 @@
 
 </head>
 <div class="row">
-  <svg id="svgMap" width="600" height="600"></svg>
+  <svg id="svgMap" width="600" height="600">
+    <defs>
+      <clipPath id="circleClip">
+        <circle cx="250" cy="250" r="200" />
+      </clipPath>
+    </defs>
+  </svg>
+
   <div class="column" style="margin: 10px;">
     <div id="controlfilter"></div>
 
@@ -127,6 +134,8 @@
     </div>
   </div>
 </div>
+
+
 
 <body>
 
@@ -229,6 +238,7 @@
         .clampX(false);
 
       const levels = svgMap.append("g")
+        // .style('clip-path', "url(#circleClip)") //this clips the map to a circle
         .attr("pointer-events", "none")
         .selectAll("g")
         .data(deltas)
