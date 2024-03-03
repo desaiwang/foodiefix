@@ -238,7 +238,7 @@
         .clampX(false);
 
       const levels = svgMap.append("g")
-        // .style('clip-path', "url(#circleClip)") //this clips the map to a circle
+        .style('clip-path', "url(#circleClip)") //this clips the map to a circle
         .attr("pointer-events", "none")
         .selectAll("g")
         .data(deltas)
