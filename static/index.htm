@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>INFO 4310 - HW2</title>
+  <title>INFO 4310 - HW3</title>
   <!-- TODO-C: temp styles from old assignment, feel free to update -->
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
   <link href="./style.css" rel="stylesheet" type="text/css">
@@ -308,6 +308,37 @@
         });
 
 
+      const myCoordinates = {
+        latitude: 42.36541856,
+        longitude: -71.05688332
+      };
+
+      console.log(myCoordinates);
+      let myLocation = svgMap.selectAll("circle.me").data([myCoordinates])
+        .join("circle")
+        .attr("class", "me")
+        .attr("r", 7)
+        .attr("fill", "black")
+        .attr("opacity", 0.4)
+        .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
+        .call(d3.drag()
+          .on("start", (event, d) => console.log("drag start"))
+          .on("drag", (event, d) => {
+            console.log("dragging");
+
+            newCoords = projection.invert([event.x, event.y]);
+            console.log(newCoords);
+            d.longitude = newCoords[0];
+            d.latitude = newCoords[1];
+            updateMyLocation();
+            console.log(d);
+          })
+          .on("end", (event, d) => console.log("drag end"))
+          .on("start.update drag.update end.update", console.log("update")));
+
+      function updateMyLocation() {
+        myLocation.attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
+      }
       var zoom = d3.zoom()
         .scaleExtent([1 << 18.5, 1 << 25])
         .on("zoom", ({ transform }) => zoomed(transform));
@@ -325,6 +356,7 @@
 
 
       function zoomed(transform) {
+        console.log("regular projection", projection([42.36541856, -71.05688332]))
 
         levels.each(function (delta) {
           const tiles = tile.zoomDelta(delta)(transform);
@@ -347,6 +379,8 @@
 
         circles
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
+
+        myLocation.attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
       };
 
       //from INFO3300 notes, makes brush histogram filter
@@ -374,13 +408,11 @@
         eateries = eateriesAll.filter(d => pointPassesFilters(d));
 
         console.log('filtered eateries', eateries);
-        console.log(eateries[0]["longitude"], eateries[0]["latitude"]);
-        console.log(projection([eateries[0]["longitude"], eateries[0]["latitude"]]));
-        console.log(projection([-71.05686665, 42.35140831]));
-        // Draw the circles
-        // circles.data(eateries)
-        //   .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
+        // console.log(eateries[0]["longitude"], eateries[0]["latitude"]);
+        // console.log(projection([eateries[0]["longitude"], eateries[0]["latitude"]]));
+        // console.log(projection([-71.05686665, 42.35140831]));
 
+        // Draw the circles
         circles = svgEateries.selectAll("circle.eateries").data(eateries)
           .join("circle")
           .attr("class", "eateries")
@@ -413,7 +445,6 @@
           });
 
 
-        console.log("circles:", circles);
       }
 
 
@@ -425,7 +456,7 @@
 
         // Find min and max for some scales
         let minMax = d3.extent(values);
-        console.log(minMax);
+        // console.log(minMax);
         let xScale = d3.scaleLinear().domain(minMax)
           .range([10, sliderWidth - 10]); // padding here for ease
         let xAxis = d3.axisBottom(xScale).tickFormat(d3.format(""));
@@ -484,7 +515,7 @@
 
         function brushMoved(event) {
 
-          console.log(event.type, event.selection);
+          // console.log(event.type, event.selection);
 
           // Everything but clicking on brush area
           if (event.selection !== null) {
@@ -497,7 +528,6 @@
             // Overwrite old filter in our dictionary
             // This filter now only returns True if the point's value is between start and end
             let filterFunc = d => d[attribute] >= start && d[attribute] <= end;
-            console.log("ratings range: ", start, end);
             filters[attribute] = filterFunc;
 
             updateData();
@@ -509,7 +539,6 @@
             // Selected nothing, let everything pass
             let filterFunc = d => true;
             filters[attribute] = filterFunc;
-
             updateData();
 
           }
