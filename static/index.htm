@@ -238,7 +238,7 @@
         .clampX(false);
 
       const levels = svgMap.append("g")
-        .style('clip-path', "url(#circleClip)") //this clips the map to a circle
+        // .style('clip-path', "url(#circleClip)") //this clips the map to a circle
         .attr("pointer-events", "none")
         .selectAll("g")
         .data(deltas)
@@ -282,9 +282,7 @@
         .attr("r", 3)
         .attr("fill", "#ff3e03")
         .attr("opacity", 0.9)
-        .attr("transform", (d) => {
-          `translate(${projection([d.longitude, d.latitude])})`
-        })
+        .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
         .on("mouseover", (event) => {
           tooltip.style("visibility", "visible");
 
@@ -299,7 +297,7 @@
           box.attr("width", tooltipWidth)
 
           txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']}`)
+          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']})`)
 
           tooltip
             .raise();
@@ -348,7 +346,7 @@
           .translate([transform.x, transform.y]);
 
         circles
-          .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`);
+          .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
       };
 
       //from INFO3300 notes, makes brush histogram filter
@@ -376,19 +374,46 @@
         eateries = eateriesAll.filter(d => pointPassesFilters(d));
 
         console.log('filtered eateries', eateries);
-        console.log(projection([]));
+        console.log(eateries[0]["longitude"], eateries[0]["latitude"]);
+        console.log(projection([eateries[0]["longitude"], eateries[0]["latitude"]]));
+        console.log(projection([-71.05686665, 42.35140831]));
         // Draw the circles
-        svgEateries.selectAll("circle.eateries").data(eateries)
+        // circles.data(eateries)
+        //   .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
+
+        circles = svgEateries.selectAll("circle.eateries").data(eateries)
           .join("circle")
           .attr("class", "eateries")
           .attr("r", 3)
           .attr("fill", "#ff3e03")
           .attr("opacity", 0.9)
-          .attr("cx", 0)
-          .attr("cy", 0)
-          .attr("transform", (d) => {
-            `translate(${projection([d.longitude, d.latitude])})`
+          .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
+          .on("mouseover", (event) => {
+            tooltip.style("visibility", "visible");
+
+
+            let eatery = event.target.__data__
+
+            //dynamically adjusts width, delete later
+            tooltipWidth = eatery['name'].length * 10
+            if (tooltipWidth < 100) { tooltipWidth = 120; }
+
+
+            box.attr("width", tooltipWidth)
+
+            txt.text(eatery['name']);
+            txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+
+            tooltip
+              .raise();
+
+          })
+          .on("mouseout", (event) => {
+            tooltip.style("visibility", "hidden");
           });
+
+
+        console.log("circles:", circles);
       }
 
 
@@ -472,13 +497,11 @@
             // Overwrite old filter in our dictionary
             // This filter now only returns True if the point's value is between start and end
             let filterFunc = d => d[attribute] >= start && d[attribute] <= end;
-            console.log(filterFunc);
+            console.log("ratings range: ", start, end);
             filters[attribute] = filterFunc;
-            console.log(filters[attribute]);
-
 
             updateData();
-            console.log(eateries);
+
 
           }
           // Clicking on brush area to empty it out
@@ -488,7 +511,6 @@
             filters[attribute] = filterFunc;
 
             updateData();
-            console.log(eateries);
 
           }
 
