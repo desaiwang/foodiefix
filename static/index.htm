@@ -245,6 +245,20 @@
         .join("g")
         .style("opacity", null); //set to 0.3 to see low resolution files
 
+      //myLocation
+      let myCoordinates = {
+        latitude: 42.36541856,
+        longitude: -71.05688332
+      };
+
+      let latdiff_1mile = 57.296 / 3963;
+
+      let radiusBuffer = svgMap.append("circle")
+        .attr("r", 15)
+        .attr("fill", "#BD9DF0")
+        .attr("opacity", 0.4)
+        .attr("transform", `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
+
       //Mouseover interaction
       let tooltipWidth = 250;
       let tooltipHeight = 45;
@@ -275,12 +289,17 @@
         .attr("y", 25);
 
       let svgEateries = svgMap.append("g");
+
       //circles that represent eateries
+      //set up colors 
+      const selectedColor = "#7339D0";
+      const greyedoutColor = "#A5A0AC";
+
       let circles = svgEateries.selectAll("circle.eateries").data(eateries)
         .join("circle")
         .attr("class", "eateries")
         .attr("r", 3)
-        .attr("fill", "#ff3e03")
+        .attr("fill", selectedColor)
         .attr("opacity", 0.9)
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
         .on("mouseover", (event) => {
@@ -307,37 +326,50 @@
           tooltip.style("visibility", "hidden");
         });
 
-
-      const myCoordinates = {
-        latitude: 42.36541856,
-        longitude: -71.05688332
-      };
-
-      console.log(myCoordinates);
       let myLocation = svgMap.selectAll("circle.me").data([myCoordinates])
         .join("circle")
         .attr("class", "me")
-        .attr("r", 7)
-        .attr("fill", "black")
-        .attr("opacity", 0.4)
+        .attr("r", 3)
+        .attr("fill", "yellow")
+        .attr("opacity", 1)
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
         .call(d3.drag()
-          .on("start", (event, d) => console.log("drag start"))
+          // .on("start", (event, d) => console.log("drag start"))
           .on("drag", (event, d) => {
-            console.log("dragging");
+            // console.log("dragging");
 
             newCoords = projection.invert([event.x, event.y]);
-            console.log(newCoords);
             d.longitude = newCoords[0];
             d.latitude = newCoords[1];
+            [myCoordinates.longitude, myCoordinates.latitude] = newCoords;
             updateMyLocation();
-            console.log(d);
+
           })
-          .on("end", (event, d) => console.log("drag end"))
+          // .on("end", (event, d) => console.log("drag end"))
           .on("start.update drag.update end.update", console.log("update")));
 
+      //updates myLocation, radiusBuffer, and eatery color
+
       function updateMyLocation() {
+        console.log("distance: ", getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile * 3, myCoordinates.longitude))
+
+        let screen_myLocation = projection([myCoordinates.longitude, myCoordinates.latitude]);
+        let screen_radiusEnd = projection([myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile]);
+        let radius = screen_myLocation[1] - screen_radiusEnd[1];
+        // console.log("mypt:", screen_myLocation)
+        // console.log("1mile pt:", screen_radiusEnd)
+        // console.log("dist radius", radius)
+
         myLocation.attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
+        radiusBuffer
+          .attr("r", radius)
+          .attr("transform", (d) => `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
+        circles.attr("fill", (d) => {
+          d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
+          if (d.dist < 1) { return selectedColor }
+          else { return greyedoutColor }
+        })
+
       }
       var zoom = d3.zoom()
         .scaleExtent([1 << 18.5, 1 << 25])
@@ -356,7 +388,7 @@
 
 
       function zoomed(transform) {
-        console.log("regular projection", projection([42.36541856, -71.05688332]))
+        // console.log("regular projection", projection([42.36541856, -71.05688332]))
 
         levels.each(function (delta) {
           const tiles = tile.zoomDelta(delta)(transform);
@@ -380,7 +412,7 @@
         circles
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
 
-        myLocation.attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
+        updateMyLocation();
       };
 
       //from INFO3300 notes, makes brush histogram filter
@@ -417,7 +449,7 @@
           .join("circle")
           .attr("class", "eateries")
           .attr("r", 3)
-          .attr("fill", "#ff3e03")
+          .attr("fill", selectedColor)
           .attr("opacity", 0.9)
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
           .on("mouseover", (event) => {
