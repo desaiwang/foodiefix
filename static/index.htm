@@ -15,6 +15,40 @@
       flex-direction: row;
       justify-content: center
     }
+  
+  .restaurant-info-box {
+  max-width: 25em;;
+  background-color: #f9f9f9;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: -20px;
+}
+
+.restaurant-list {
+  margin-top: 10px;
+}
+
+.restaurant-item {
+  margin-bottom: 10px;
+}
+
+.restaurant-item p {
+  margin: 0;
+}
+.restaurant-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.restaurant-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
 
     .column {
       display: flex;
@@ -22,11 +56,12 @@
     }
 
     /* below are all styling for the range slider */
+    /* NOTE I CHANGED THE MARGIN FROM ORIGINAL MAIN TO ALLOW FOR MORE LISTENTRIES TO APPEAR */
     .range_container {
       display: flex;
       flex-direction: column;
       width: 80%;
-      margin: 100px auto;
+      margin: 40px auto;
     }
 
     .sliders_control {
@@ -132,6 +167,10 @@
         </div>
       </div>
     </div>
+    <div id="restaurantInfoBox" class="restaurant-info-box">
+      <h2>Restaurants Near You! </h2>
+      <div id="restaurantList" class="restaurant-list"></div>
+    </div>
   </div>
 </div>
 
@@ -218,7 +257,7 @@
       let eateries = eateriesAll; //this is used for filtering
       console.log(eateries)
 
-
+      updateRestaurantInfoBox(eateries);
       // //this is the amount of times buses stop at station per week
       // const frequencyExtentTransit = d3.extent(eateries, d => d['weekly_stop_counts']);
       // const frequencyScaleTransit = d3.scaleLog().domain(frequencyExtentTransit).range([2.5, 15]);
@@ -575,6 +614,59 @@
     function deg2rad(deg) {
       return deg * (Math.PI / 180)
     }
+
+
+    function updateRestaurantInfoBox(restaurants) {
+      const STAR_RATING = {
+        1: '★☆☆☆☆',
+        2: '★★☆☆☆',
+        3: '★★★☆☆',
+        3.5: '★★★½☆',
+        4: '★★★★☆',
+        4.5: '★★★★½',
+        5: '★★★★★'
+      };
+  const restaurantListDiv = document.getElementById('restaurantList');
+  restaurantListDiv.innerHTML = ''; // Clear previous content
+
+  restaurants.slice(0, 5).forEach(restaurant => {
+    const restaurantDiv = document.createElement('div');
+    restaurantDiv.classList.add('restaurant-card');
+
+    const name = document.createElement('p');
+    name.textContent = restaurant.name;
+    name.classList.add('restaurant-name');
+    restaurantDiv.appendChild(name);
+
+    // Retrieve star rating string from the STAR_RATING object
+    const starRating = STAR_RATING[restaurant.rating];
+    const rating = document.createElement('p');
+    rating.textContent = `Rating: ${starRating}`;
+    restaurantDiv.appendChild(rating);
+
+    const categories = JSON.parse(restaurant.categories_json).map(category => category[0]).join(', ');
+    const categoriesP = document.createElement('p');
+    categoriesP.textContent = `Categories: ${categories}`;
+    restaurantDiv.appendChild(categoriesP);
+
+    const locationInfo = JSON.parse(restaurant.location_json);
+    const address = document.createElement('p');
+    address.textContent = `Address: ${locationInfo.display_address.join(', ')}`;
+    restaurantDiv.appendChild(address);
+
+    const snippet = document.createElement('p');
+    snippet.textContent = `Snippet: ${restaurant.snippet_text}`;
+    restaurantDiv.appendChild(snippet);
+
+    restaurantListDiv.appendChild(restaurantDiv);
+
+    console.log(locationInfo)
+    console.log(rating)
+    console.log(address)
+    console.log(snippet)
+
+  });
+}
 
   </script>
 </body>
