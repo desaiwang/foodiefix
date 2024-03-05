@@ -148,7 +148,7 @@
     font-size: x-large;
     width: 20px;
     display: inline-block;
-    color: gray;
+    color: rgb(174, 174, 174);
     }
 
     .star:last-child {
@@ -160,12 +160,12 @@
     }
 
     .star.on {
-        color: gold;
+        color: #7339D0;
     }
 
     .star.half:after {
         content:'\2605';
-        color: gold;
+        color: #7339D0;
         position: absolute;
         margin-left: -20px;
         width: 10px;
@@ -829,16 +829,19 @@
     }
 
     // Function to generate stars
-    function generateStars(rating) {
+    function generateStars(data) {
+
+        let rating = data.rating;
+
         let div = document.createElement("div");
 
         // Clear previous stars
         div.innerHTML = '';
 
-        let p = document.createElement("p");
-        p.textContent = "Rating: ";
-        p.style.display = "inline"; // Set display to inline
-        div.appendChild(p);
+        // let p = document.createElement("p");
+        // p.textContent = "Rating: ";
+        // p.style.display = "inline"; // Set display to inline
+        // div.appendChild(p);
 
         // Calculate full stars
         const fullStars = Math.floor(rating);
@@ -865,6 +868,11 @@
             div.appendChild(star);
         }
 
+        let p = document.createElement("p");
+        p.textContent = ` (${data.review_count} reviews)`;
+        p.style.display = "inline"; // Set display to inline
+        div.appendChild(p);
+        
         return div;
     }
 
@@ -913,18 +921,16 @@
             .attr('class', 'restaurant-name')
             .text(d => d.name);
 
-          let ratings_temp = d.rating;
-
           d3.select(this)
           .append('div')
           .node()
-          .appendChild(generateStars(ratings_temp));
+          .appendChild(generateStars(d));
             // .append('p')
             // .text(d => `Rating: ${STAR_RATING[d.rating]}`);
 
-          d3.select(this)
-            .append('p')
-            .text(d => `Review Count: ${d.review_count}`);
+          // d3.select(this)
+          //   .append('p')
+          //   .text(d => `Review Count: ${d.review_count}`);
 
           const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
           d3.select(this)
