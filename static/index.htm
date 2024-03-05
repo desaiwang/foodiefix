@@ -16,45 +16,45 @@
       justify-content: center
     }
   
-  .restaurant-info-box {
-  max-width: 30em;
-  background-color: #f9f9f9;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-top: -20px;
-}
+    .restaurant-info-box {
+    max-width: 30em;
+    background-color: #f9f9f9;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: -20px;
+    }
 
-.restaurant-list {
-  margin-top: 10px;
- 
-}
+    .restaurant-list {
+      margin-top: 10px;
+    
+    }
 
-.restaurant-list a {
-  text-decoration: none !important; color: inherit;
-}
+    .restaurant-list a {
+      text-decoration: none !important; color: inherit;
+    }
 
-.restaurant-item {
-  margin-bottom: 10px;
-}
+    .restaurant-item {
+      margin-bottom: 10px;
+    }
 
-.restaurant-item p {
-  margin: 0;
-}
-.restaurant-card {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 8px;
-  background-color: #f9f9f9;
-  font-size: medium;
-}
+    .restaurant-item p {
+      margin: 0;
+    }
+    .restaurant-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background-color: #f9f9f9;
+      font-size: medium;
+    }
 
-.restaurant-name {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 2px;
-}
+    .restaurant-name {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
 
     .column {
       display: flex;
@@ -141,6 +141,36 @@
       height: 0;
       z-index: 1;
     }
+
+    /* testing star generation */
+    /* adapted from: https://jsfiddle.net/Auqj8/1/ */
+    .star {
+    font-size: x-large;
+    width: 20px;
+    display: inline-block;
+    color: gray;
+    }
+
+    .star:last-child {
+        margin-right: 0;
+    }
+
+    .star:before {
+        content:'\2605';
+    }
+
+    .star.on {
+        color: gold;
+    }
+
+    .star.half:after {
+        content:'\2605';
+        color: gold;
+        position: absolute;
+        margin-left: -20px;
+        width: 10px;
+        overflow: hidden;
+    }
   </style>
 
 </head>
@@ -181,11 +211,12 @@
   </div>
 </div>
 
-
+<div id="stars-container"></div>
 
 <body>
 
   <script>
+
 
     // function controlFromSlider(fromSlider, toSlider, fromInput) {
     //   console.log("from slider  moved");
@@ -277,11 +308,7 @@
       console.log(eateries)
 
       updateRestaurantInfoBox(eateries);
-    
-      // //this is the amount of times buses stop at station per week
-      // const frequencyExtentTransit = d3.extent(eateries, d => d['weekly_stop_counts']);
-      // const frequencyScaleTransit = d3.scaleLog().domain(frequencyExtentTransit).range([2.5, 15]);
-
+  
 
       const bestOfBestButton = document.getElementById('bestofbest');
       const filter_purp = eateries.slice()
@@ -752,80 +779,142 @@
       return deg * (Math.PI / 180)
     }
 
+    
+    // Number of stars to create
+    const numStars = 5;
+
+    // Function to create a star element
+    function createStar(isFilled, isHalf) {
+        const star = document.createElement('span');
+        star.classList.add('star');
+        if (isFilled) {
+            star.classList.add('on');
+        }
+        if (isHalf) {
+            star.classList.add('half');
+        }
+        return star;
+    }
+
+    // Function to generate stars
+    function generateStars(rating) {
+        let div = document.createElement("div");
+
+        // Clear previous stars
+        div.innerHTML = '';
+
+        let p = document.createElement("p");
+        p.textContent = "Rating: ";
+        p.style.display = "inline"; // Set display to inline
+        div.appendChild(p);
+
+        // Calculate full stars
+        const fullStars = Math.floor(rating);
+
+        // Calculate half star
+        const hasHalfStar = rating % 1 !== 0;
+
+        // Generate full stars
+        for (let i = 0; i < fullStars; i++) {
+            const star = createStar(true, false);
+            div.appendChild(star);
+        }
+
+        // Generate half star
+        if (hasHalfStar) {
+            const halfStar = createStar(false, true);
+            div.appendChild(halfStar);
+        }
+
+        // Generate empty stars
+        const emptyStars = numStars - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+            const star = createStar(false, false);
+            div.appendChild(star);
+        }
+
+        return div;
+    }
+
     function updateRestaurantInfoBox(restaurants) {
       console.log(restaurants)
-        const STAR_RATING = {
-          1: '★☆☆☆☆',
-          2: '★★☆☆☆',
-          3: '★★★☆☆',
-          3.5: '★★★½☆',
-          4: '★★★★☆',
-          4.5: '★★★★½',
-          5: '★★★★★'
-        };
+        // const STAR_RATING = {
+        //   1: '★☆☆☆☆',
+        //   2: '★★☆☆☆',
+        //   3: '★★★☆☆',
+        //   3.5: '★★★½☆',
+        //   4: '★★★★☆',
+        //   4.5: '★★★★½',
+        //   5: '★★★★★'
+        // };
 
-  const restaurantListDiv = d3.select('#restaurantList');
-  restaurantListDiv.selectAll("*").remove();
+      const restaurantListDiv = d3.select('#restaurantList');
+      restaurantListDiv.selectAll("*").remove();
 
 
 
-  // Bind data to restaurant cards
-  const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
-    .data(restaurants.slice(0, 5)); // Limit to first 5 restaurants
+      // Bind data to restaurant cards
+      const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
+        .data(restaurants.slice(0, 5)); // Limit to first 5 restaurants
 
-  // Enter selection - create new elements for restaurants
-  const newRestaurantCards = restaurantCards.enter()
-    .append('div')
-    .attr('class', 'restaurant-card');
+      // Enter selection - create new elements for restaurants
+      const newRestaurantCards = restaurantCards.enter()
+        .append('div')
+        .attr('class', 'restaurant-card');
 
-  const anchorTags = newRestaurantCards.append('a')
-    .attr('href', d => d.url) // Set href attribute to the restaurant's URL
-    .attr('target', '_blank'); // Open link in a new tab
+      const anchorTags = newRestaurantCards.append('a')
+        .attr('href', d => d.url) // Set href attribute to the restaurant's URL
+        .attr('target', '_blank'); // Open link in a new tab
 
-  anchorTags.style('color', 'inherit')
-    .style('text-decoration', 'none');
+      anchorTags.style('color', 'inherit')
+        .style('text-decoration', 'none');
 
-  // Append anchor tags to new restaurant cards
-  anchorTags.append('a')
-    .attr('href', d => d.url) // Set href attribute to the restaurant's URL
-    .attr('target', '_blank') // Open link in a new tab
-    .each(function (d) {
-      // For each anchor tag, append details of the restaurant
-      
-      d3.select(this)
-        .append('p')
-        .attr('class', 'restaurant-name')
-        .text(d => d.name);
+      // Append anchor tags to new restaurant cards
+      anchorTags.append('a')
+        .attr('href', d => d.url) // Set href attribute to the restaurant's URL
+        .attr('target', '_blank') // Open link in a new tab
+        .each(function (d) {
+          // For each anchor tag, append details of the restaurant
+          
+          d3.select(this)
+            .append('p')
+            .attr('class', 'restaurant-name')
+            .text(d => d.name);
 
-      d3.select(this)
-        .append('p')
-        .text(d => `Rating: ${STAR_RATING[d.rating]}`);
+          let ratings_temp = d.rating;
 
-      d3.select(this)
-        .append('p')
-        .text(d => `Review Count: ${d.review_count}`);
+          d3.select(this)
+          .append('div')
+          .node()
+          .appendChild(generateStars(ratings_temp));
+            // .append('p')
+            // .text(d => `Rating: ${STAR_RATING[d.rating]}`);
 
-      const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
-      d3.select(this)
-        .append('p')
-        .text(`Categories: ${categories}`);
+          d3.select(this)
+            .append('p')
+            .text(d => `Review Count: ${d.review_count}`);
 
-      const locationInfo = JSON.parse(d.location_json);
-      d3.select(this)
-        .append('p')
-        .text(`Address: ${locationInfo.display_address.join(', ')}`);
+          const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
+          d3.select(this)
+            .append('p')
+            .text(`Categories: ${categories}`);
 
-      d3.select(this)
-        .append('p')
-        .text(d => `Snippet: ${d.snippet_text}`);
-    });
+          const locationInfo = JSON.parse(d.location_json);
+          d3.select(this)
+            .append('p')
+            .text(`Address: ${locationInfo.display_address.join(', ')}`);
 
-  // Update existing restaurant cards
-  restaurantCards.select('a')
-    .attr('href', d => d.url);
+          d3.select(this)
+            .append('p')
+            .text(d => `Snippet: ${d.snippet_text}`);
+        });
 
-  // Remove excess restaurant cards
-  restaurantCards.exit().remove();
+      // Update existing restaurant cards
+      restaurantCards.select('a')
+        .attr('href', d => d.url);
+
+      // Remove excess restaurant cards
+      restaurantCards.exit().remove();
 
 
 
