@@ -171,6 +171,23 @@
         width: 10px;
         overflow: hidden;
     }
+
+    button {
+      background-color:  #ffffff; /* Green */
+      border:2px solid #8a8a8a;
+      color: #8a8a8a;
+      border-radius: 10px;
+      padding: 5px 10px;
+    }
+
+    .clicked {
+      background-color:  #e3d2fd; /* Green */
+      border:2px solid #7339D0;
+      color: #7339D0;
+      border-radius: 10px;
+      padding: 5px 10px;
+    }
+
   </style>
 
 </head>
@@ -203,7 +220,18 @@
         </div>
       </div>
     </div>
-    <div style = "margin-bottom: 20px;"> <p><button id = "bestofbest" style = "margin-left:1em;"> Best of Best</button><button id = "revert" style = "margin-left:1em;"> Revert</button></p></div>
+
+    <div id ="distance" style = "margin-bottom: 5px;"> 
+      <p><button id = "mi0.25" style = "margin-left:1em;"> 0.25 mi</button>
+        <button id = "mi0.5" style = "margin-left:1em;"> 0.5 mi</button>
+        <button id = "mi1" style = "margin-left:1em;"> 1 mi</button>
+      </p></div>
+
+    <div style = "margin-bottom: 20px;"> 
+      <p><button id = "bestofbest" style = "margin-left:1em;"> Best of Best</button>
+        <button id = "revert" style = "margin-left:1em;"> Revert</button>
+      </p></div>
+
     <div id="restaurantInfoBox" class="restaurant-info-box">
       <h2>Restaurants Near You! </h2>
       <div id="restaurantList" class="restaurant-list" ></div>
@@ -302,6 +330,10 @@
 
     const requestMapData = async () => {
 
+      let latdiff_1mile = 57.296 / 3963;
+      let curr_latdiff = 0;
+      let filter_dist = Infinity;
+
       //eatery data
       const eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
       let eateries = eateriesAll; //this is used for filtering
@@ -337,9 +369,73 @@
         console.log(eateries)
         updateRestaurantInfoBox(eateries);
       });
-      
-      
+    
+    //buttons for distance
+    
 
+    const mi1 = document.getElementById('mi1');
+    const mi1_2 = document.getElementById('mi0.5');
+    const mi1_4 = document.getElementById('mi0.25');
+
+    let mi1_toggle = false;
+    let mi1_2_toggle = false;
+    let mi1_4_toggle = false;
+
+
+    mi1.addEventListener('click', () => {
+      mi1.classList.toggle('clicked');
+      mi1_toggle = !mi1_toggle;
+
+      mi1_2_toggle = false;
+      mi1_4_toggle = false;
+
+      update_dist();
+    });
+    mi1_2.addEventListener('click', () => {
+      mi1_2.classList.toggle('clicked');
+      mi1_toggle = false;
+      mi1_2_toggle = !mi1_2_toggle;
+      mi1_4_toggle = false;
+
+      update_dist();
+    });
+    mi1_4.addEventListener('click', () => {
+      mi1_4.classList.toggle('clicked');
+      mi1_toggle = false;
+      mi1_2_toggle = false;
+      mi1_4_toggle = !mi1_4_toggle;
+
+      update_dist();
+    });
+
+    function update_dist(){
+      if (!mi1_toggle){
+        mi1.classList.remove('clicked');
+      }else{
+        curr_latdiff = latdiff_1mile
+        filter_dist = 1;
+      }
+
+      if (!mi1_2_toggle){
+        mi1_2.classList.remove('clicked');
+      }else{
+        curr_latdiff = latdiff_1mile/2
+        filter_dist = 0.5;
+      }
+
+      if (!mi1_4_toggle){
+        mi1_4.classList.remove('clicked');
+      }else{
+        curr_latdiff = latdiff_1mile/4
+        filter_dist = 0.25;
+      }
+
+      if (!mi1_4_toggle && !mi1_2_toggle && !mi1_toggle){
+        curr_latdiff = 0
+        filter_dist = Infinity;
+      }
+      updateMyLocation();
+    }
 
       const projection = d3.geoMercator()
         .scale(1 / (2 * Math.PI))
@@ -367,7 +463,7 @@
         longitude: -71.05688332
       };
 
-      let latdiff_1mile = 57.296 / 3963;
+
 
       let radiusBuffer = svgMap.append("circle")
         .attr("r", 15)
@@ -466,11 +562,12 @@
 
       //updates myLocation, radiusBuffer, and eatery color
 
+
       function updateMyLocation() {
         console.log("distance: ", getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile * 3, myCoordinates.longitude))
 
         let screen_myLocation = projection([myCoordinates.longitude, myCoordinates.latitude]);
-        let screen_radiusEnd = projection([myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile]);
+        let screen_radiusEnd = projection([myCoordinates.longitude, myCoordinates.latitude + curr_latdiff]);
         let radius = screen_myLocation[1] - screen_radiusEnd[1];
         // console.log("mypt:", screen_myLocation)
         // console.log("1mile pt:", screen_radiusEnd)
@@ -480,9 +577,11 @@
         radiusBuffer
           .attr("r", radius)
           .attr("transform", (d) => `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
-        circles.attr("fill", (d) => {
+        
+          //TODO: this needs new data, not just a color update
+          circles.attr("fill", (d) => {
           d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
-          if (d.dist < 1) { return selectedColor }
+          if (d.dist < filter_dist) { return selectedColor }
           else { return greyedoutColor }
         })
 
