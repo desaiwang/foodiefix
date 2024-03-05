@@ -15,6 +15,46 @@
       flex-direction: row;
       justify-content: center
     }
+  
+    .restaurant-info-box {
+    max-width: 30em;
+    background-color: #f9f9f9;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: -20px;
+    }
+
+    .restaurant-list {
+      margin-top: 10px;
+    
+    }
+
+    .restaurant-list a {
+      text-decoration: none !important; color: inherit;
+    }
+
+    .restaurant-item {
+      margin-bottom: 10px;
+    }
+
+    .restaurant-item p {
+      margin: 0;
+    }
+    .restaurant-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background-color: #f9f9f9;
+      font-size: medium;
+    }
+
+    .restaurant-name {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
 
     .column {
       display: flex;
@@ -22,11 +62,12 @@
     }
 
     /* below are all styling for the range slider */
+    /* NOTE I CHANGED THE MARGIN FROM ORIGINAL MAIN TO ALLOW FOR MORE LISTENTRIES TO APPEAR */
     .range_container {
       display: flex;
       flex-direction: column;
       width: 80%;
-      margin: 100px auto;
+      margin: 40px auto;
     }
 
     .sliders_control {
@@ -100,6 +141,36 @@
       height: 0;
       z-index: 1;
     }
+
+    /* testing star generation */
+    /* adapted from: https://jsfiddle.net/Auqj8/1/ */
+    .star {
+    font-size: x-large;
+    width: 20px;
+    display: inline-block;
+    color: gray;
+    }
+
+    .star:last-child {
+        margin-right: 0;
+    }
+
+    .star:before {
+        content:'\2605';
+    }
+
+    .star.on {
+        color: gold;
+    }
+
+    .star.half:after {
+        content:'\2605';
+        color: gold;
+        position: absolute;
+        margin-left: -20px;
+        width: 10px;
+        overflow: hidden;
+    }
   </style>
 
 </head>
@@ -132,73 +203,91 @@
         </div>
       </div>
     </div>
+    <div style = "margin-bottom: 20px;"> <p><button id = "bestofbest" style = "margin-left:1em;"> Best of Best</button><button id = "revert" style = "margin-left:1em;"> Revert</button></p></div>
+    <div id="restaurantInfoBox" class="restaurant-info-box">
+      <h2>Restaurants Near You! </h2>
+      <div id="restaurantList" class="restaurant-list" ></div>
+    </div>
   </div>
 </div>
 
-
+<div id="stars-container"></div>
 
 <body>
 
   <script>
 
-    function controlFromSlider(fromSlider, toSlider, fromInput) {
-      console.log("from slider  moved");
-      const [from, to] = [fromSlider.value, toSlider.value];
-      fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-      if (from > to) {
-        fromSlider.value = to;
-        fromInput.text(to);
-      } else {
-        fromInput.value = from;
-        fromInput.text(from);
-      }
-    }
 
-    function controlToSlider(fromSlider, toSlider, toInput) {
-      const [from, to] = [fromSlider.value, toSlider.value];
-      fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-      setToggleAccessible(toSlider);
-      if (from <= to) {
-        toSlider.value = to;
-        toInput.text(to);
-      } else {
-        toInput.value = from;
-        toInput.text(from);
-      }
-    }
+    // function controlFromSlider(fromSlider, toSlider, fromInput) {
+    //   console.log("from slider  moved");
+    //   const [from, to] = [fromSlider.value, toSlider.value];
+    //   fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+    //   if (from > to) {
+    //     fromSlider.value = to;
+    //     fromInput.text(to);
+    //   } else {
+    //     fromInput.value = from;
+    //     fromInput.text(from);
+    //   }
+    // }
 
-    function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
-      const rangeDistance = to.max - to.min;
-      const fromPosition = from.value - to.min;
-      const toPosition = to.value - to.min;
-      controlSlider.style.background = `linear-gradient(
-      to right,
-      ${sliderColor} 0%,
-      ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
-      ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
-      ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
-      ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
-      ${sliderColor} 100%)`;
-    }
+    // function controlToSlider(fromSlider, toSlider, toInput) {
+    //   const [from, to] = [fromSlider.value, toSlider.value];
+    //   fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+    //   setToggleAccessible(toSlider);
+    //   if (from <= to) {
+    //     toSlider.value = to;
+    //     toInput.text(to);
+    //   } else {
+    //     toInput.value = from;
+    //     toInput.text(from);
+    //   }
+    // }
 
-    function setToggleAccessible(currentTarget) {
-      const toSlider = document.querySelector('#toSlider');
-      if (Number(currentTarget.value) <= 0) {
-        toSlider.style.zIndex = 2;
-      } else {
-        toSlider.style.zIndex = 0;
-      }
-    }
+    // function fillSlider(from, to, sliderColor, rangeColor, controlSlider, eateries) {
+    //   const rangeDistance = to.max - to.min;
+    //   const fromPosition = from.value - to.min;
+    //   const toPosition = to.value - to.min;
+    //   controlSlider.style.background = `linear-gradient(
+    //   to right,
+    //   ${sliderColor} 0%,
+    //   ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
+    //   ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
+    //   ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
+    //   ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
+    //   ${sliderColor} 100%)`;
+    // }
+  
+    // function setToggleAccessible(currentTarget) {
+    //   const toSlider = document.querySelector('#toSlider');
+    //   if (Number(currentTarget.value) <= 0) {
+    //     toSlider.style.zIndex = 2;
+    //   } else {
+    //     toSlider.style.zIndex = 0;
+    //   }
+    // }
 
-    const fromSlider = document.querySelector('#fromSlider');
-    const toSlider = document.querySelector('#toSlider');
-    const fromInput = d3.select('#fromInput');
-    const toInput = d3.select('#toInput');
-    fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-    setToggleAccessible(toSlider);
+    // const fromSlider = document.querySelector('#fromSlider');
+    // const toSlider = document.querySelector('#toSlider');
+    // const fromInput = d3.select('#fromInput');
+    // const toInput = d3.select('#toInput');
+    // fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+    // setToggleAccessible(toSlider);
 
-    fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
-    toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
+    // fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
+    // toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
+    //      // Filter by review values range
+    // const fromValue = fromSlider.value;
+    // const toValue = toSlider.value;
+    // let reviewValueFilterFunc = d => d['rating'] >= fromValue && d['rating'] <= toValue;
+    // let dum_eatery = entries;
+    // eat_val = dum_eatery.filter(reviewValueFilterFunc);
+    // // Update the filtered data
+    // updateData();
+
+    // // Update the restaurant list based on the filtered data
+    // updateRestaurantInfoBox(eat_val);
+
 
   </script>
   <script id="map">
@@ -218,11 +307,38 @@
       let eateries = eateriesAll; //this is used for filtering
       console.log(eateries)
 
+      updateRestaurantInfoBox(eateries);
+  
 
-      // //this is the amount of times buses stop at station per week
-      // const frequencyExtentTransit = d3.extent(eateries, d => d['weekly_stop_counts']);
-      // const frequencyScaleTransit = d3.scaleLog().domain(frequencyExtentTransit).range([2.5, 15]);
+      const bestOfBestButton = document.getElementById('bestofbest');
+      const filter_purp = eateries.slice()
+      bestOfBestButton.addEventListener('click', () => {
+        console.log("clicked best of best now sorting");
+        const filtered_eat = filter_purp.sort((a, b) => {
+          // Sort by rating descending
+          if (a.rating !== b.rating) {
+            return b.rating - a.rating;
+          }
+          // If ratings are the same, sort by review count descending
+          return b.review_count - a.review_count;
+        });
 
+        // Call the update function with the sorted restaurants
+        console.log(filtered_eat)
+        console.log(eateries);
+        updateRestaurantInfoBox(filtered_eat);
+
+      });
+
+      const revert = document.getElementById('revert');
+      revert.addEventListener('click', () => {
+        console.log("clicked revert orginal list");
+        // Call the update function with the sorted restaurants
+        console.log(eateries)
+        updateRestaurantInfoBox(eateries);
+      });
+      
+      
 
 
       const projection = d3.geoMercator()
@@ -563,6 +679,7 @@
             filters[attribute] = filterFunc;
 
             updateData();
+            updateRestaurantInfoBox(eateries);
 
 
           }
@@ -579,8 +696,94 @@
         canvas.append("g").attr("class", "brush").call(brush);
       }
 
-      let controls = d3.select("#controlfilter");
-      makeSlider(controls, "# of Reviews", "review_count", 250, 20);
+        let controls = d3.select("#controlfilter");
+        makeSlider(controls, "# of Reviews", "review_count", 250, 20);
+
+
+        function controlFromSlider(fromSlider, toSlider, fromInput) {
+        console.log("from slider  moved");
+        const [from, to] = [fromSlider.value, toSlider.value];
+        fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+        if (from > to) {
+          fromSlider.value = to;
+          fromInput.text(to);
+        } else {
+          fromInput.value = from;
+          fromInput.text(from);
+        }
+        filterRestaurants();
+      }
+
+      function controlToSlider(fromSlider, toSlider, toInput) {
+        const [from, to] = [fromSlider.value, toSlider.value];
+        fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+        setToggleAccessible(toSlider);
+        if (from <= to) {
+          toSlider.value = to;
+          toInput.text(to);
+        } else {
+          toInput.value = from;
+          toInput.text(from);
+        }
+        filterRestaurants();
+
+      }
+
+      function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
+        const rangeDistance = to.max - to.min;
+        const fromPosition = from.value - to.min;
+        const toPosition = to.value - to.min;
+        controlSlider.style.background = `linear-gradient(
+        to right,
+        ${sliderColor} 0%,
+        ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
+        ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
+        ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
+        ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
+        ${sliderColor} 100%)`;
+      }
+    
+      function setToggleAccessible(currentTarget) {
+        const toSlider = document.querySelector('#toSlider');
+        if (Number(currentTarget.value) <= 0) {
+          toSlider.style.zIndex = 2;
+        } else {
+          toSlider.style.zIndex = 0;
+        }
+      }
+
+      const fromSlider = document.querySelector('#fromSlider');
+      const toSlider = document.querySelector('#toSlider');
+      const fromInput = d3.select('#fromInput');
+      const toInput = d3.select('#toInput');
+      fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+      setToggleAccessible(toSlider);
+
+      // Attach event listeners to the sliders
+      fromSlider.addEventListener('input', () => controlFromSlider(fromSlider, toSlider, fromInput));
+      toSlider.addEventListener('input', () => controlToSlider(fromSlider, toSlider, toInput));
+          
+      
+      
+      
+      
+      // Filter by review values range
+      function filterRestaurants() {
+        console.log("triggered fliter slide")
+      
+        const fromValue = (fromSlider.value);
+        const toValue = (toSlider.value);
+        console.log(`from value: ${fromValue}`)
+        console.log(`To value: ${toValue}`)
+        let dum_eatery = eateries;
+        const filteredRestaurants = dum_eatery.filter(d => d.rating >= fromValue && d.rating <= toValue);
+        console.log(filteredRestaurants)
+        // Update the restaurant list based on the filtered data
+        updateData();
+        updateRestaurantInfoBox(filteredRestaurants);
+      }
+
+    
 
     }
 
@@ -608,5 +811,157 @@
       return deg * (Math.PI / 180)
     }
 
+    
+    // Number of stars to create
+    const numStars = 5;
+
+    // Function to create a star element
+    function createStar(isFilled, isHalf) {
+        const star = document.createElement('span');
+        star.classList.add('star');
+        if (isFilled) {
+            star.classList.add('on');
+        }
+        if (isHalf) {
+            star.classList.add('half');
+        }
+        return star;
+    }
+
+    // Function to generate stars
+    function generateStars(rating) {
+        let div = document.createElement("div");
+
+        // Clear previous stars
+        div.innerHTML = '';
+
+        let p = document.createElement("p");
+        p.textContent = "Rating: ";
+        p.style.display = "inline"; // Set display to inline
+        div.appendChild(p);
+
+        // Calculate full stars
+        const fullStars = Math.floor(rating);
+
+        // Calculate half star
+        const hasHalfStar = rating % 1 !== 0;
+
+        // Generate full stars
+        for (let i = 0; i < fullStars; i++) {
+            const star = createStar(true, false);
+            div.appendChild(star);
+        }
+
+        // Generate half star
+        if (hasHalfStar) {
+            const halfStar = createStar(false, true);
+            div.appendChild(halfStar);
+        }
+
+        // Generate empty stars
+        const emptyStars = numStars - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+            const star = createStar(false, false);
+            div.appendChild(star);
+        }
+
+        return div;
+    }
+
+    function updateRestaurantInfoBox(restaurants) {
+      console.log(restaurants)
+        // const STAR_RATING = {
+        //   1: '★☆☆☆☆',
+        //   2: '★★☆☆☆',
+        //   3: '★★★☆☆',
+        //   3.5: '★★★½☆',
+        //   4: '★★★★☆',
+        //   4.5: '★★★★½',
+        //   5: '★★★★★'
+        // };
+
+      const restaurantListDiv = d3.select('#restaurantList');
+      restaurantListDiv.selectAll("*").remove();
+
+
+
+      // Bind data to restaurant cards
+      const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
+        .data(restaurants.slice(0, 5)); // Limit to first 5 restaurants
+
+      // Enter selection - create new elements for restaurants
+      const newRestaurantCards = restaurantCards.enter()
+        .append('div')
+        .attr('class', 'restaurant-card');
+
+      const anchorTags = newRestaurantCards.append('a')
+        .attr('href', d => d.url) // Set href attribute to the restaurant's URL
+        .attr('target', '_blank'); // Open link in a new tab
+
+      anchorTags.style('color', 'inherit')
+        .style('text-decoration', 'none');
+
+      // Append anchor tags to new restaurant cards
+      anchorTags.append('a')
+        .attr('href', d => d.url) // Set href attribute to the restaurant's URL
+        .attr('target', '_blank') // Open link in a new tab
+        .each(function (d) {
+          // For each anchor tag, append details of the restaurant
+          
+          d3.select(this)
+            .append('p')
+            .attr('class', 'restaurant-name')
+            .text(d => d.name);
+
+          let ratings_temp = d.rating;
+
+          d3.select(this)
+          .append('div')
+          .node()
+          .appendChild(generateStars(ratings_temp));
+            // .append('p')
+            // .text(d => `Rating: ${STAR_RATING[d.rating]}`);
+
+          d3.select(this)
+            .append('p')
+            .text(d => `Review Count: ${d.review_count}`);
+
+          const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
+          d3.select(this)
+            .append('p')
+            .text(`Categories: ${categories}`);
+
+          const locationInfo = JSON.parse(d.location_json);
+          d3.select(this)
+            .append('p')
+            .text(`Address: ${locationInfo.display_address.join(', ')}`);
+
+          d3.select(this)
+            .append('p')
+            .text(d => `Snippet: ${d.snippet_text}`);
+        });
+
+      // Update existing restaurant cards
+      restaurantCards.select('a')
+        .attr('href', d => d.url);
+
+      // Remove excess restaurant cards
+      restaurantCards.exit().remove();
+
+
+
+  /** TODO: TO THINK ABOUT WHEN NEXT PICKUP
+   *  a scroll bar to contain the resturants
+   * the category icons buttons!
+   * distance filter? 
+   * animation to smoothen transitions
+   * maybe switch the two buttons to a single toggle
+   * add the rating number next to the stars and the number of reviews in '()' next to the review number
+   *  create an distinction between "best of best" and "all results"
+   * add comment icon for the speech
+   * */
+}
+
   </script>
+  
 </body>
