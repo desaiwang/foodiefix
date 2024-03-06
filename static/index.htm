@@ -4,6 +4,7 @@
   <title>INFO 4310 - HW3</title>
   <!-- TODO-C: temp styles from old assignment, feel free to update -->
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="./style.css" rel="stylesheet" type="text/css">
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -63,38 +64,6 @@
       flex-direction: column;
     }
 
-    /* testing star generation */
-    /* adapted from: https://jsfiddle.net/Auqj8/1/ */
-    .star {
-      font-size: x-large;
-      width: 20px;
-      display: inline-block;
-      color: rgb(174, 174, 174);
-    }
-
-    .star:last-child {
-      margin-right: 0;
-    }
-
-    .star:before {
-      content: '\2605';
-    }
-
-    .star.on {
-      color: #7339D0;
-    }
-
-    .star.half:after {
-      content: '\2605';
-      color: #7339D0;
-      position: absolute;
-      /* margin-top: -1.4em;  */
-      margin-left: -20px;
-      /*TODO: what is this */
-      width: 10px;
-      overflow: hidden;
-    }
-
     button {
       background-color: #ffffff;
       /* Green */
@@ -111,6 +80,18 @@
       color: #7339D0;
       border-radius: 10px;
       padding: 5px 10px;
+    }
+
+    .fa-star-o {
+      color: #7339D0
+    }
+
+    .fa.checked {
+      color: #7339D0
+    }
+
+    .fa-star-half-full {
+      color: #7339D0
     }
   </style>
 
@@ -140,7 +121,6 @@
     </div>
   </div>
 </div>
-
 
 
 <body>
@@ -597,6 +577,9 @@
     const numStars = 5;
 
     // Function to create a star element
+    /* testing star generation */
+    /* adapted from: https://jsfiddle.net/Auqj8/1/ */
+
     function createStar(isFilled, isHalf) {
       const star = document.createElement('span');
       star.classList.add('star');
@@ -632,20 +615,39 @@
 
       // Generate full stars
       for (let i = 0; i < fullStars; i++) {
-        const star = createStar(true, false);
+        // const star = createStar(true, false);
+        // div.appendChild(star);
+
+        const star = document.createElement('span')
+        star.className = ("fa fa-star checked");
         div.appendChild(star);
+
       }
+
+      //       <span class="fa fa-star checked"></span>
+      // <span class="fa fa-star checked"></span>
+      // <span class="fa fa-star checked"></span>
+      // <span class="fa fa-star-half-full"></span>
+      // <span class="fa fa-star"></span>
 
       // Generate half star
       if (hasHalfStar) {
-        const halfStar = createStar(false, true);
-        div.appendChild(halfStar);
+        // const halfStar = createStar(false, true);
+        // div.appendChild(halfStar);
+
+        const star = document.createElement('span')
+        star.className = ("fa fa-star-half-full");
+        div.appendChild(star);
       }
 
       // Generate empty stars
       const emptyStars = numStars - fullStars - (hasHalfStar ? 1 : 0);
       for (let i = 0; i < emptyStars; i++) {
-        const star = createStar(false, false);
+        // const star = createStar(false, false);
+        // div.appendChild(star);
+
+        const star = document.createElement('span')
+        star.className = ("fa fa-star-o");
         div.appendChild(star);
       }
 
