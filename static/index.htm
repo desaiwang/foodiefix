@@ -429,7 +429,7 @@
 
 
       function updateMyLocation() {
-        console.log("distance: ", getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile * 3, myCoordinates.longitude))
+        // console.log("distance: ", getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile * 3, myCoordinates.longitude))
 
         let screen_myLocation = projection([myCoordinates.longitude, myCoordinates.latitude]);
         let screen_radiusEnd = projection([myCoordinates.longitude, myCoordinates.latitude + curr_latdiff]);
@@ -454,11 +454,7 @@
           else { return greyedoutColor }
         })
 
-        console.log("inside updateMyLocation, filterdist", filter_dist)
-        console.log("inside updateMyLocation, eateries before update", eateriesInRadius)
-
         eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
-        console.log("inside updateMyLocation, eateries", eateriesInRadius)
         updateRestaurantInfoBox(eateriesInRadius);
 
       }
@@ -671,7 +667,7 @@
       //   4.5: '★★★★½',
       //   5: '★★★★★'
       // };
-      console.log("making infobox", eateries);
+
       const restaurantListDiv = d3.select('#restaurantList');
       restaurantListDiv.selectAll("*").remove();
 
