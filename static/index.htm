@@ -222,10 +222,19 @@
     </div>
 
     <div id ="distance" style = "margin-bottom: 5px;"> 
-      <p><button id = "mi0.25" style = "margin-left:1em;"> 0.25 mi</button>
+      <p>
+        <button id = "mi0.25" style = "margin-left:1em;"> 0.25 mi</button>
         <button id = "mi0.5" style = "margin-left:1em;"> 0.5 mi</button>
         <button id = "mi1" style = "margin-left:1em;"> 1 mi</button>
-      </p></div>
+      </p>
+    
+      <p>
+        <button id = "c01" style = "margin-left:1em;">restaurants</button>
+        <button id = "c02" style = "margin-left:1em;">cafes</button>
+        <button id = "c03" style = "margin-left:1em;">coffee</button>
+        <button id = "c04" style = "margin-left:1em;">sandwiches</button>
+      </p>    
+    </div>
 
     <div style = "margin-bottom: 20px;"> 
       <p><button id = "bestofbest" style = "margin-left:1em;"> Best of Best</button>
@@ -370,18 +379,20 @@
         updateRestaurantInfoBox(eateries);
       });
     
+
+
     //buttons for distance
-    
 
     const mi1 = document.getElementById('mi1');
     const mi1_2 = document.getElementById('mi0.5');
     const mi1_4 = document.getElementById('mi0.25');
-
+    
+    // set button toggle to false by default
     let mi1_toggle = false;
     let mi1_2_toggle = false;
     let mi1_4_toggle = false;
 
-
+    // click button and unclick when other button is clicked
     mi1.addEventListener('click', () => {
       mi1.classList.toggle('clicked');
       mi1_toggle = !mi1_toggle;
@@ -408,8 +419,10 @@
       update_dist();
     });
 
+    // 
     function update_dist(){
       if (!mi1_toggle){
+        console.log("Brett");
         mi1.classList.remove('clicked');
       }else{
         curr_latdiff = latdiff_1mile
@@ -436,6 +449,13 @@
       }
       updateMyLocation();
     }
+
+    // category filter buttons
+
+
+
+
+    // MAO
 
       const projection = d3.geoMercator()
         .scale(1 / (2 * Math.PI))
