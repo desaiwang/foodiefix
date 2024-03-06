@@ -167,7 +167,8 @@
         content:'\2605';
         color: #7339D0;
         position: absolute;
-        margin-left: -20px;
+        /* margin-top: -1.4em;  */
+        margin-left: -20px; /*TODO: what is this */
         width: 10px;
         overflow: hidden;
     }
@@ -220,11 +221,13 @@
         </div>
       </div>
     </div>
+    <svg id="histogram" width=500 height=120></svg>
 
-    <div id ="distance" style = "margin-bottom: 5px;"> 
+    <div id ="distance" style = "margin-bottom: 20px;"> 
       <p><button id = "mi0.25" style = "margin-left:1em;"> 0.25 mi</button>
         <button id = "mi0.5" style = "margin-left:1em;"> 0.5 mi</button>
         <button id = "mi1" style = "margin-left:1em;"> 1 mi</button>
+        <!-- <button id = "mi1" style = "margin-left:1em;"> sushi 🍣</button> -->
       </p></div>
 
     <div style = "margin-bottom: 20px;"> 
@@ -239,7 +242,7 @@
   </div>
 </div>
 
-<div id="stars-container"></div>
+
 
 <body>
 
@@ -335,7 +338,76 @@
       let filter_dist = Infinity;
 
       //eatery data
-      const eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
+      let eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
+
+      //set up histogram
+      const marginHist = ({ top: 20, right: 20, bottom: 40, left: 20 })
+      const widthHist = 200;
+      const heightHist = 100;
+      let bins = d3.bin().thresholds(4).value(d => d.rating)(eateriesAll);
+      console.log("bins", bins);
+      let barPadding = 1;
+      let svgHist = d3.select("#histogram");
+
+      xScale = d3
+      .scaleLinear()
+      .domain([bins[0].x0, bins[bins.length - 1].x1])
+      .range([marginHist.left, widthHist - marginHist.right])
+
+      x = d3.scaleBand()
+            .domain([3.5, 4, 4.5, 5])
+            .range([marginHist.left, widthHist - marginHist.right])
+            .padding(0.3)
+
+      yScale = d3
+      .scaleSymlog()
+      .domain([0, d3.max(bins, d => d.length)])
+      .nice()
+      .range([heightHist - marginHist.bottom, marginHist.top])
+
+      let xAxis = (g) =>
+       { g
+          .attr("transform", `translate(${0},${heightHist - marginHist.bottom})`)
+          .call(           
+            d3.axisBottom(x)
+              .ticks(5)
+              .tickSizeOuter(0)
+          )
+        };
+
+          svgHist
+          .append("g")
+          .attr("fill", "steelblue")
+          .selectAll("rect")
+          .data(bins)
+          .join("rect")
+          .attr("x", d => xScale(d.x0) + barPadding) // position of each bar on xAxis, width adjustment (bar padding)
+          .attr("y", d => yScale(d.length))
+          .attr("width", d => d3.max([0, xScale(d.x1) - xScale(d.x0) - barPadding]))
+          .attr("height", d => yScale(0) - yScale(d.length))
+          .on('mouseover', function(d, i) {
+            console.log(i);
+            d3.select(this).attr('style', 'fill: orange;');
+            d3.select("#toptext").text(`Metropolitan Areas: ${i.length}`);
+          })
+          .on('mouseout', function(d, i) {
+            d3.select(this).attr('style', 'outline: thin solid clear;');
+            d3.select("#toptext").text(`Metropolitan Areas: ${0}`);
+          });
+
+  svgHist.append("g").call(xAxis);
+
+      // eateriesAll = eateriesAll.sort((a, b) => {
+
+      //     // Sort by rating descending
+      //     if (a.rating !== b.rating) {
+      //       return b.rating - a.rating;
+      //     }
+
+      //     // If ratings are the same, sort by review count descending
+      //     return b.review_count - a.review_count;
+      //   });
+
       let eateries = eateriesAll; //this is used for filtering
       console.log(eateries)
 
