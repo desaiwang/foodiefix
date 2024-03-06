@@ -15,23 +15,24 @@
       flex-direction: row;
       justify-content: center
     }
-  
+
     .restaurant-info-box {
-    max-width: 30em;
-    background-color: #f9f9f9;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-top: -20px;
+      max-width: 30em;
+      background-color: #f9f9f9;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: -20px;
     }
 
     .restaurant-list {
       margin-top: 10px;
-    
+
     }
 
     .restaurant-list a {
-      text-decoration: none !important; color: inherit;
+      text-decoration: none !important;
+      color: inherit;
     }
 
     .restaurant-item {
@@ -41,6 +42,7 @@
     .restaurant-item p {
       margin: 0;
     }
+
     .restaurant-card {
       border: 1px solid #ccc;
       border-radius: 5px;
@@ -145,50 +147,52 @@
     /* testing star generation */
     /* adapted from: https://jsfiddle.net/Auqj8/1/ */
     .star {
-    font-size: x-large;
-    width: 20px;
-    display: inline-block;
-    color: rgb(174, 174, 174);
+      font-size: x-large;
+      width: 20px;
+      display: inline-block;
+      color: rgb(174, 174, 174);
     }
 
     .star:last-child {
-        margin-right: 0;
+      margin-right: 0;
     }
 
     .star:before {
-        content:'\2605';
+      content: '\2605';
     }
 
     .star.on {
-        color: #7339D0;
+      color: #7339D0;
     }
 
     .star.half:after {
-        content:'\2605';
-        color: #7339D0;
-        position: absolute;
-        /* margin-top: -1.4em;  */
-        margin-left: -20px; /*TODO: what is this */
-        width: 10px;
-        overflow: hidden;
+      content: '\2605';
+      color: #7339D0;
+      position: absolute;
+      /* margin-top: -1.4em;  */
+      margin-left: -20px;
+      /*TODO: what is this */
+      width: 10px;
+      overflow: hidden;
     }
 
     button {
-      background-color:  #ffffff; /* Green */
-      border:2px solid #8a8a8a;
+      background-color: #ffffff;
+      /* Green */
+      border: 2px solid #8a8a8a;
       color: #8a8a8a;
       border-radius: 10px;
       padding: 5px 10px;
     }
 
     .clicked {
-      background-color:  #e3d2fd; /* Green */
-      border:2px solid #7339D0;
+      background-color: #e3d2fd;
+      /* Green */
+      border: 2px solid #7339D0;
       color: #7339D0;
       border-radius: 10px;
       padding: 5px 10px;
     }
-
   </style>
 
 </head>
@@ -202,9 +206,9 @@
   </svg>
 
   <div class="column" style="margin: 10px;">
-    <div id="controlfilter"></div>
+    <!-- <div id="controlfilter"></div> -->
 
-    <!-- slider adapted from https://codepen.io/predragdavidovic/pen/mdpMoWo -->
+    <!-- slider adapted from https://codepen.io/predragdavidovic/pen/mdpMoWo
     <div class="range_container">
       <div class="sliders_control">
         <input id="fromSlider" type="range" value="3.5" min="3.5" max="5" step="0.5" />
@@ -220,24 +224,25 @@
           <text class="form_control_container__time__input" id="toInput">5</text>
         </div>
       </div>
-    </div>
+    </div> -->
     <svg id="histogram" width=500 height=120></svg>
 
-    <div id ="distance" style = "margin-bottom: 20px;"> 
-      <p><button id = "mi0.25" style = "margin-left:1em;"> 0.25 mi</button>
-        <button id = "mi0.5" style = "margin-left:1em;"> 0.5 mi</button>
-        <button id = "mi1" style = "margin-left:1em;"> 1 mi</button>
+    <div id="distance" style="margin-bottom: 20px;">
+      <p><button id="mi0.25" style="margin-left:1em;"> 0.25 mi</button>
+        <button id="mi0.5" style="margin-left:1em;"> 0.5 mi</button>
+        <button id="mi1" style="margin-left:1em;"> 1 mi</button>
         <!-- <button id = "mi1" style = "margin-left:1em;"> sushi 🍣</button> -->
-      </p></div>
+      </p>
+    </div>
 
-    <div style = "margin-bottom: 20px;"> 
+    <!-- <div style = "margin-bottom: 20px;"> 
       <p><button id = "bestofbest" style = "margin-left:1em;"> Best of Best</button>
         <button id = "revert" style = "margin-left:1em;"> Revert</button>
-      </p></div>
+      </p></div> -->
 
     <div id="restaurantInfoBox" class="restaurant-info-box">
-      <h2>Restaurants Near You! </h2>
-      <div id="restaurantList" class="restaurant-list" ></div>
+      <h2>Restaurants Near You </h2>
+      <div id="restaurantList" class="restaurant-list"></div>
     </div>
   </div>
 </div>
@@ -246,81 +251,6 @@
 
 <body>
 
-  <script>
-
-
-    // function controlFromSlider(fromSlider, toSlider, fromInput) {
-    //   console.log("from slider  moved");
-    //   const [from, to] = [fromSlider.value, toSlider.value];
-    //   fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-    //   if (from > to) {
-    //     fromSlider.value = to;
-    //     fromInput.text(to);
-    //   } else {
-    //     fromInput.value = from;
-    //     fromInput.text(from);
-    //   }
-    // }
-
-    // function controlToSlider(fromSlider, toSlider, toInput) {
-    //   const [from, to] = [fromSlider.value, toSlider.value];
-    //   fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-    //   setToggleAccessible(toSlider);
-    //   if (from <= to) {
-    //     toSlider.value = to;
-    //     toInput.text(to);
-    //   } else {
-    //     toInput.value = from;
-    //     toInput.text(from);
-    //   }
-    // }
-
-    // function fillSlider(from, to, sliderColor, rangeColor, controlSlider, eateries) {
-    //   const rangeDistance = to.max - to.min;
-    //   const fromPosition = from.value - to.min;
-    //   const toPosition = to.value - to.min;
-    //   controlSlider.style.background = `linear-gradient(
-    //   to right,
-    //   ${sliderColor} 0%,
-    //   ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
-    //   ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
-    //   ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
-    //   ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
-    //   ${sliderColor} 100%)`;
-    // }
-  
-    // function setToggleAccessible(currentTarget) {
-    //   const toSlider = document.querySelector('#toSlider');
-    //   if (Number(currentTarget.value) <= 0) {
-    //     toSlider.style.zIndex = 2;
-    //   } else {
-    //     toSlider.style.zIndex = 0;
-    //   }
-    // }
-
-    // const fromSlider = document.querySelector('#fromSlider');
-    // const toSlider = document.querySelector('#toSlider');
-    // const fromInput = d3.select('#fromInput');
-    // const toInput = d3.select('#toInput');
-    // fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-    // setToggleAccessible(toSlider);
-
-    // fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
-    // toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
-    //      // Filter by review values range
-    // const fromValue = fromSlider.value;
-    // const toValue = toSlider.value;
-    // let reviewValueFilterFunc = d => d['rating'] >= fromValue && d['rating'] <= toValue;
-    // let dum_eatery = entries;
-    // eat_val = dum_eatery.filter(reviewValueFilterFunc);
-    // // Update the filtered data
-    // updateData();
-
-    // // Update the restaurant list based on the filtered data
-    // updateRestaurantInfoBox(eat_val);
-
-
-  </script>
   <script id="map">
     const svgMap = d3.select("#svgMap");
     const width = svgMap.attr("width");
@@ -339,6 +269,16 @@
 
       //eatery data
       let eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
+      eateriesAll = eateriesAll.sort((a, b) => {
+
+        // Sort by rating descending
+        if (a.rating !== b.rating) {
+          return b.rating - a.rating;
+        }
+
+        // If ratings are the same, sort by review count descending
+        return b.review_count - a.review_count;
+      });
 
       //set up histogram
       const marginHist = ({ top: 20, right: 20, bottom: 40, left: 20 })
@@ -350,164 +290,155 @@
       let svgHist = d3.select("#histogram");
 
       xScale = d3
-      .scaleLinear()
-      .domain([bins[0].x0, bins[bins.length - 1].x1])
-      .range([marginHist.left, widthHist - marginHist.right])
+        .scaleLinear()
+        .domain([bins[0].x0, bins[bins.length - 1].x1])
+        .range([marginHist.left, widthHist - marginHist.right])
 
       x = d3.scaleBand()
-            .domain([3.5, 4, 4.5, 5])
-            .range([marginHist.left, widthHist - marginHist.right])
-            .padding(0.3)
+        .domain([3.5, 4, 4.5, 5])
+        .range([marginHist.left, widthHist - marginHist.right])
+        .padding(0.3)
 
       yScale = d3
-      .scaleSymlog()
-      .domain([0, d3.max(bins, d => d.length)])
-      .nice()
-      .range([heightHist - marginHist.bottom, marginHist.top])
+        .scaleSymlog()
+        .domain([0, d3.max(bins, d => d.length)])
+        .nice()
+        .range([heightHist - marginHist.bottom, marginHist.top])
 
-      let xAxis = (g) =>
-       { g
+      let xAxis = (g) => {
+        g
           .attr("transform", `translate(${0},${heightHist - marginHist.bottom})`)
-          .call(           
+          .call(
             d3.axisBottom(x)
               .ticks(5)
               .tickSizeOuter(0)
           )
-        };
+      };
 
-          svgHist
-          .append("g")
-          .attr("fill", "steelblue")
-          .selectAll("rect")
-          .data(bins)
-          .join("rect")
-          .attr("x", d => xScale(d.x0) + barPadding) // position of each bar on xAxis, width adjustment (bar padding)
-          .attr("y", d => yScale(d.length))
-          .attr("width", d => d3.max([0, xScale(d.x1) - xScale(d.x0) - barPadding]))
-          .attr("height", d => yScale(0) - yScale(d.length))
-          .on('mouseover', function(d, i) {
-            console.log(i);
-            d3.select(this).attr('style', 'fill: orange;');
-            d3.select("#toptext").text(`Metropolitan Areas: ${i.length}`);
-          })
-          .on('mouseout', function(d, i) {
-            d3.select(this).attr('style', 'outline: thin solid clear;');
-            d3.select("#toptext").text(`Metropolitan Areas: ${0}`);
-          });
+      svgHist
+        .append("g")
+        .attr("fill", "steelblue")
+        .selectAll("rect")
+        .data(bins)
+        .join("rect")
+        .attr("x", d => xScale(d.x0) + barPadding) // position of each bar on xAxis, width adjustment (bar padding)
+        .attr("y", d => yScale(d.length))
+        .attr("width", d => d3.max([0, xScale(d.x1) - xScale(d.x0) - barPadding]))
+        .attr("height", d => yScale(0) - yScale(d.length))
+        .on('mouseover', function (d, i) {
+          console.log(i);
+          d3.select(this).attr('style', 'fill: orange;');
+          d3.select("#toptext").text(`Metropolitan Areas: ${i.length}`);
+        })
+        .on('mouseout', function (d, i) {
+          d3.select(this).attr('style', 'outline: thin solid clear;');
+          d3.select("#toptext").text(`Metropolitan Areas: ${0}`);
+        });
 
-  svgHist.append("g").call(xAxis);
+      svgHist.append("g").call(xAxis);
 
-      // eateriesAll = eateriesAll.sort((a, b) => {
 
+
+      let eateries = eateriesAll; //this is used for filtering
+      let eateriesInRadius = eateriesAll; //this is used for best of best list
+
+      updateRestaurantInfoBox(eateries);
+
+
+      // const bestOfBestButton = document.getElementById('bestofbest');
+      // const filter_purp = eateries.slice()
+      // bestOfBestButton.addEventListener('click', () => {
+      //   console.log("clicked best of best now sorting");
+      //   const filtered_eat = filter_purp.sort((a, b) => {
       //     // Sort by rating descending
       //     if (a.rating !== b.rating) {
       //       return b.rating - a.rating;
       //     }
-
       //     // If ratings are the same, sort by review count descending
       //     return b.review_count - a.review_count;
       //   });
 
-      let eateries = eateriesAll; //this is used for filtering
-      console.log(eateries)
+      //   // Call the update function with the sorted restaurants
+      //   console.log(filtered_eat)
+      //   console.log(eateries);
+      //   updateRestaurantInfoBox(filtered_eat);
 
-      updateRestaurantInfoBox(eateries);
-  
+      // });
 
-      const bestOfBestButton = document.getElementById('bestofbest');
-      const filter_purp = eateries.slice()
-      bestOfBestButton.addEventListener('click', () => {
-        console.log("clicked best of best now sorting");
-        const filtered_eat = filter_purp.sort((a, b) => {
-          // Sort by rating descending
-          if (a.rating !== b.rating) {
-            return b.rating - a.rating;
-          }
-          // If ratings are the same, sort by review count descending
-          return b.review_count - a.review_count;
-        });
+      // const revert = document.getElementById('revert');
+      // revert.addEventListener('click', () => {
+      //   console.log("clicked revert orginal list");
+      //   // Call the update function with the sorted restaurants
+      //   console.log(eateries)
+      //   updateRestaurantInfoBox(eateries);
+      // });
 
-        // Call the update function with the sorted restaurants
-        console.log(filtered_eat)
-        console.log(eateries);
-        updateRestaurantInfoBox(filtered_eat);
+      //buttons for distance
 
+
+      const mi1 = document.getElementById('mi1');
+      const mi1_2 = document.getElementById('mi0.5');
+      const mi1_4 = document.getElementById('mi0.25');
+
+      let mi1_toggle = false;
+      let mi1_2_toggle = false;
+      let mi1_4_toggle = false;
+
+
+      mi1.addEventListener('click', () => {
+        mi1.classList.toggle('clicked');
+        mi1_toggle = !mi1_toggle;
+
+        mi1_2_toggle = false;
+        mi1_4_toggle = false;
+
+        update_dist();
+      });
+      mi1_2.addEventListener('click', () => {
+        mi1_2.classList.toggle('clicked');
+        mi1_toggle = false;
+        mi1_2_toggle = !mi1_2_toggle;
+        mi1_4_toggle = false;
+
+        update_dist();
+      });
+      mi1_4.addEventListener('click', () => {
+        mi1_4.classList.toggle('clicked');
+        mi1_toggle = false;
+        mi1_2_toggle = false;
+        mi1_4_toggle = !mi1_4_toggle;
+
+        update_dist();
       });
 
-      const revert = document.getElementById('revert');
-      revert.addEventListener('click', () => {
-        console.log("clicked revert orginal list");
-        // Call the update function with the sorted restaurants
-        console.log(eateries)
-        updateRestaurantInfoBox(eateries);
-      });
-    
-    //buttons for distance
-    
+      function update_dist() {
+        if (!mi1_toggle) {
+          mi1.classList.remove('clicked');
+        } else {
+          curr_latdiff = latdiff_1mile
+          filter_dist = 1;
+        }
 
-    const mi1 = document.getElementById('mi1');
-    const mi1_2 = document.getElementById('mi0.5');
-    const mi1_4 = document.getElementById('mi0.25');
+        if (!mi1_2_toggle) {
+          mi1_2.classList.remove('clicked');
+        } else {
+          curr_latdiff = latdiff_1mile / 2
+          filter_dist = 0.5;
+        }
 
-    let mi1_toggle = false;
-    let mi1_2_toggle = false;
-    let mi1_4_toggle = false;
+        if (!mi1_4_toggle) {
+          mi1_4.classList.remove('clicked');
+        } else {
+          curr_latdiff = latdiff_1mile / 4
+          filter_dist = 0.25;
+        }
 
-
-    mi1.addEventListener('click', () => {
-      mi1.classList.toggle('clicked');
-      mi1_toggle = !mi1_toggle;
-
-      mi1_2_toggle = false;
-      mi1_4_toggle = false;
-
-      update_dist();
-    });
-    mi1_2.addEventListener('click', () => {
-      mi1_2.classList.toggle('clicked');
-      mi1_toggle = false;
-      mi1_2_toggle = !mi1_2_toggle;
-      mi1_4_toggle = false;
-
-      update_dist();
-    });
-    mi1_4.addEventListener('click', () => {
-      mi1_4.classList.toggle('clicked');
-      mi1_toggle = false;
-      mi1_2_toggle = false;
-      mi1_4_toggle = !mi1_4_toggle;
-
-      update_dist();
-    });
-
-    function update_dist(){
-      if (!mi1_toggle){
-        mi1.classList.remove('clicked');
-      }else{
-        curr_latdiff = latdiff_1mile
-        filter_dist = 1;
+        if (!mi1_4_toggle && !mi1_2_toggle && !mi1_toggle) {
+          curr_latdiff = 0
+          filter_dist = Infinity;
+        }
+        updateMyLocation();
       }
-
-      if (!mi1_2_toggle){
-        mi1_2.classList.remove('clicked');
-      }else{
-        curr_latdiff = latdiff_1mile/2
-        filter_dist = 0.5;
-      }
-
-      if (!mi1_4_toggle){
-        mi1_4.classList.remove('clicked');
-      }else{
-        curr_latdiff = latdiff_1mile/4
-        filter_dist = 0.25;
-      }
-
-      if (!mi1_4_toggle && !mi1_2_toggle && !mi1_toggle){
-        curr_latdiff = 0
-        filter_dist = Infinity;
-      }
-      updateMyLocation();
-    }
 
       const projection = d3.geoMercator()
         .scale(1 / (2 * Math.PI))
@@ -649,11 +580,16 @@
         radiusBuffer
           .attr("r", radius)
           .attr("transform", (d) => `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
-        
-          //TODO: this needs new data, not just a color update
-          circles.attr("fill", (d) => {
+
+        eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
+        updateRestaurantInfoBox(eateriesInRadius);
+
+        //TODO: this needs new data, not just a color update
+        circles.attr("fill", (d) => {
           d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
-          if (d.dist < filter_dist) { return selectedColor }
+          if (d.dist < filter_dist) {
+            return selectedColor
+          }
           else { return greyedoutColor }
         })
 
@@ -767,194 +703,194 @@
       }
 
 
-      function makeSlider(container, label, attribute, sliderWidth, sliderHeight) {
+      // function makeSlider(container, label, attribute, sliderWidth, sliderHeight) {
 
-        // Get a raw array of values for this property
-        let values = eateries.map(d => d[attribute]);
-
-
-        // Find min and max for some scales
-        let minMax = d3.extent(values);
-        // console.log(minMax);
-        let xScale = d3.scaleLinear().domain(minMax)
-          .range([10, sliderWidth - 10]); // padding here for ease
-        let xAxis = d3.axisBottom(xScale).tickFormat(d3.format(""));
+      //   // Get a raw array of values for this property
+      //   let values = eateries.map(d => d[attribute]);
 
 
-        // Create some HTML elements
-        let wrapper = container.append("div").attr("class", "controls");
-        wrapper.append("div").text(label);
-        let canvas = wrapper.append("svg").attr("width", sliderWidth)
-          .attr("height", sliderHeight + 20)
-          .attr("attribute", attribute);
-        canvas.append("g").attr("transform", `translate(0,${sliderHeight})`)
-          .call(xAxis);
-
-        // Make an area chart
-        let areaLayer = canvas.append("g");
-
-        // Built-in d3 helper function to count up data
-        let numBins = 10;
-
-        // Program a histogram generator to count up data into "bins"
-        let histoGen = d3.histogram().domain(minMax)
-          .thresholds(numBins);
-        let counts = histoGen(values);
-
-        // add dummy object at start of graph
-        counts.unshift({
-          x0: 0,
-          x1: counts[0].x0,
-          length: counts[0].length
-        });
-
-        let yScale = d3.scaleLinear().domain(d3.extent(counts, d => d.length))
-          .range([sliderHeight, 4]);
-
-        // Area generator is like a lineGen, but we give y0 and y1 to fill it in
-        let area = d3.area().x(d => xScale(d.x1))
-          .y0(yScale(0))
-          .y1(d => yScale(d.length))
-          .curve(d3.curveNatural);
-
-        // Adding the path works just like a line (the area generator just makes a filled region)
-        areaLayer.append("path").datum(counts)
-          .attr("class", "area")
-          .attr("fill", "#ff3e03") //Color
-          .attr("d", area);
+      //   // Find min and max for some scales
+      //   let minMax = d3.extent(values);
+      //   // console.log(minMax);
+      //   let xScale = d3.scaleLinear().domain(minMax)
+      //     .range([10, sliderWidth - 10]); // padding here for ease
+      //   let xAxis = d3.axisBottom(xScale).tickFormat(d3.format(""));
 
 
-        let filterFunc = d => true;
-        filters[attribute] = filterFunc;
+      //   // Create some HTML elements
+      //   let wrapper = container.append("div").attr("class", "controls");
+      //   wrapper.append("div").text(label);
+      //   let canvas = wrapper.append("svg").attr("width", sliderWidth)
+      //     .attr("height", sliderHeight + 20)
+      //     .attr("attribute", attribute);
+      //   canvas.append("g").attr("transform", `translate(0,${sliderHeight})`)
+      //     .call(xAxis);
 
-        var brush = d3.brushX().extent([[10, 0],                           // Upper left corner
-        [sliderWidth - 10, sliderHeight]])  // Lower right corner
-          .on("brush end", brushMoved);
-        // NOTE: we still need to *call the brush* towards the end of our code to "paste" it into HTML
+      //   // Make an area chart
+      //   let areaLayer = canvas.append("g");
 
-        function brushMoved(event) {
+      //   // Built-in d3 helper function to count up data
+      //   let numBins = 10;
 
-          // console.log(event.type, event.selection);
+      //   // Program a histogram generator to count up data into "bins"
+      //   let histoGen = d3.histogram().domain(minMax)
+      //     .thresholds(numBins);
+      //   let counts = histoGen(values);
 
-          // Everything but clicking on brush area
-          if (event.selection !== null) {
+      //   // add dummy object at start of graph
+      //   counts.unshift({
+      //     x0: 0,
+      //     x1: counts[0].x0,
+      //     length: counts[0].length
+      //   });
 
-            // Run scales in reverse to get data values for the ends of the brush
-            //  If a scale turns data -> pixels, then scale.invert turns pixels -> data
-            let start = xScale.invert(event.selection[0]);
-            let end = xScale.invert(event.selection[1]);
+      //   let yScale = d3.scaleLinear().domain(d3.extent(counts, d => d.length))
+      //     .range([sliderHeight, 4]);
 
-            // Overwrite old filter in our dictionary
-            // This filter now only returns True if the point's value is between start and end
-            let filterFunc = d => d[attribute] >= start && d[attribute] <= end;
-            filters[attribute] = filterFunc;
+      //   // Area generator is like a lineGen, but we give y0 and y1 to fill it in
+      //   let area = d3.area().x(d => xScale(d.x1))
+      //     .y0(yScale(0))
+      //     .y1(d => yScale(d.length))
+      //     .curve(d3.curveNatural);
 
-            updateData();
-            updateRestaurantInfoBox(eateries);
-
-
-          }
-          // Clicking on brush area to empty it out
-          else {
-            // Selected nothing, let everything pass
-            let filterFunc = d => true;
-            filters[attribute] = filterFunc;
-            updateData();
-
-          }
-
-        }
-        canvas.append("g").attr("class", "brush").call(brush);
-      }
-
-        let controls = d3.select("#controlfilter");
-        makeSlider(controls, "# of Reviews", "review_count", 250, 20);
+      //   // Adding the path works just like a line (the area generator just makes a filled region)
+      //   areaLayer.append("path").datum(counts)
+      //     .attr("class", "area")
+      //     .attr("fill", "#ff3e03") //Color
+      //     .attr("d", area);
 
 
-        function controlFromSlider(fromSlider, toSlider, fromInput) {
-        console.log("from slider  moved");
-        const [from, to] = [fromSlider.value, toSlider.value];
-        fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-        if (from > to) {
-          fromSlider.value = to;
-          fromInput.text(to);
-        } else {
-          fromInput.value = from;
-          fromInput.text(from);
-        }
-        filterRestaurants();
-      }
+      //   let filterFunc = d => true;
+      //   filters[attribute] = filterFunc;
 
-      function controlToSlider(fromSlider, toSlider, toInput) {
-        const [from, to] = [fromSlider.value, toSlider.value];
-        fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-        setToggleAccessible(toSlider);
-        if (from <= to) {
-          toSlider.value = to;
-          toInput.text(to);
-        } else {
-          toInput.value = from;
-          toInput.text(from);
-        }
-        filterRestaurants();
+      //   var brush = d3.brushX().extent([[10, 0],                           // Upper left corner
+      //   [sliderWidth - 10, sliderHeight]])  // Lower right corner
+      //     .on("brush end", brushMoved);
+      //   // NOTE: we still need to *call the brush* towards the end of our code to "paste" it into HTML
 
-      }
+      //   function brushMoved(event) {
 
-      function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
-        const rangeDistance = to.max - to.min;
-        const fromPosition = from.value - to.min;
-        const toPosition = to.value - to.min;
-        controlSlider.style.background = `linear-gradient(
-        to right,
-        ${sliderColor} 0%,
-        ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
-        ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
-        ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
-        ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
-        ${sliderColor} 100%)`;
-      }
-    
-      function setToggleAccessible(currentTarget) {
-        const toSlider = document.querySelector('#toSlider');
-        if (Number(currentTarget.value) <= 0) {
-          toSlider.style.zIndex = 2;
-        } else {
-          toSlider.style.zIndex = 0;
-        }
-      }
+      //     // console.log(event.type, event.selection);
 
-      const fromSlider = document.querySelector('#fromSlider');
-      const toSlider = document.querySelector('#toSlider');
-      const fromInput = d3.select('#fromInput');
-      const toInput = d3.select('#toInput');
-      fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
-      setToggleAccessible(toSlider);
+      //     // Everything but clicking on brush area
+      //     if (event.selection !== null) {
 
-      // Attach event listeners to the sliders
-      fromSlider.addEventListener('input', () => controlFromSlider(fromSlider, toSlider, fromInput));
-      toSlider.addEventListener('input', () => controlToSlider(fromSlider, toSlider, toInput));
-          
-      
-      
-      
-      
+      //       // Run scales in reverse to get data values for the ends of the brush
+      //       //  If a scale turns data -> pixels, then scale.invert turns pixels -> data
+      //       let start = xScale.invert(event.selection[0]);
+      //       let end = xScale.invert(event.selection[1]);
+
+      //       // Overwrite old filter in our dictionary
+      //       // This filter now only returns True if the point's value is between start and end
+      //       let filterFunc = d => d[attribute] >= start && d[attribute] <= end;
+      //       filters[attribute] = filterFunc;
+
+      //       updateData();
+      //       // updateRestaurantInfoBox(eateries);
+
+
+      //     }
+      //     // Clicking on brush area to empty it out
+      //     else {
+      //       // Selected nothing, let everything pass
+      //       let filterFunc = d => true;
+      //       filters[attribute] = filterFunc;
+      //       updateData();
+
+      //     }
+
+      //   }
+      //   canvas.append("g").attr("class", "brush").call(brush);
+      // }
+
+      // let controls = d3.select("#controlfilter");
+      // makeSlider(controls, "# of Reviews", "review_count", 250, 20);
+
+
+      // function controlFromSlider(fromSlider, toSlider, fromInput) {
+      //   console.log("from slider  moved");
+      //   const [from, to] = [fromSlider.value, toSlider.value];
+      //   fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+      //   if (from > to) {
+      //     fromSlider.value = to;
+      //     fromInput.text(to);
+      //   } else {
+      //     fromInput.value = from;
+      //     fromInput.text(from);
+      //   }
+      //   filterRestaurants();
+      // }
+
+      // function controlToSlider(fromSlider, toSlider, toInput) {
+      //   const [from, to] = [fromSlider.value, toSlider.value];
+      //   fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+      //   setToggleAccessible(toSlider);
+      //   if (from <= to) {
+      //     toSlider.value = to;
+      //     toInput.text(to);
+      //   } else {
+      //     toInput.value = from;
+      //     toInput.text(from);
+      //   }
+      //   filterRestaurants();
+
+      // }
+
+      // function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
+      //   const rangeDistance = to.max - to.min;
+      //   const fromPosition = from.value - to.min;
+      //   const toPosition = to.value - to.min;
+      //   controlSlider.style.background = `linear-gradient(
+      //   to right,
+      //   ${sliderColor} 0%,
+      //   ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
+      //   ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
+      //   ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
+      //   ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
+      //   ${sliderColor} 100%)`;
+      // }
+
+      // function setToggleAccessible(currentTarget) {
+      //   const toSlider = document.querySelector('#toSlider');
+      //   if (Number(currentTarget.value) <= 0) {
+      //     toSlider.style.zIndex = 2;
+      //   } else {
+      //     toSlider.style.zIndex = 0;
+      //   }
+      // }
+
+      // const fromSlider = document.querySelector('#fromSlider');
+      // const toSlider = document.querySelector('#toSlider');
+      // const fromInput = d3.select('#fromInput');
+      // const toInput = d3.select('#toInput');
+      // fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+      // setToggleAccessible(toSlider);
+
+      // // Attach event listeners to the sliders
+      // fromSlider.addEventListener('input', () => controlFromSlider(fromSlider, toSlider, fromInput));
+      // toSlider.addEventListener('input', () => controlToSlider(fromSlider, toSlider, toInput));
+
+
+
+
+
       // Filter by review values range
-      function filterRestaurants() {
-        console.log("triggered fliter slide")
-      
-        const fromValue = (fromSlider.value);
-        const toValue = (toSlider.value);
-        console.log(`from value: ${fromValue}`)
-        console.log(`To value: ${toValue}`)
-        let dum_eatery = eateries;
-        const filteredRestaurants = dum_eatery.filter(d => d.rating >= fromValue && d.rating <= toValue);
-        console.log(filteredRestaurants)
-        // Update the restaurant list based on the filtered data
-        updateData();
-        updateRestaurantInfoBox(filteredRestaurants);
-      }
+      // function filterRestaurants() {
+      //   console.log("triggered fliter slide")
 
-    
+      //   const fromValue = (fromSlider.value);
+      //   const toValue = (toSlider.value);
+      //   console.log(`from value: ${fromValue}`)
+      //   console.log(`To value: ${toValue}`)
+      //   let dum_eatery = eateries;
+      //   const filteredRestaurants = dum_eatery.filter(d => d.rating >= fromValue && d.rating <= toValue);
+      //   console.log(filteredRestaurants)
+      //   // Update the restaurant list based on the filtered data
+      //   updateData();
+      //   // updateRestaurantInfoBox(filteredRestaurants);
+      // }
+
+
 
     }
 
@@ -982,122 +918,123 @@
       return deg * (Math.PI / 180)
     }
 
-    
+
     // Number of stars to create
     const numStars = 5;
 
     // Function to create a star element
     function createStar(isFilled, isHalf) {
-        const star = document.createElement('span');
-        star.classList.add('star');
-        if (isFilled) {
-            star.classList.add('on');
-        }
-        if (isHalf) {
-            star.classList.add('half');
-        }
-        return star;
+      const star = document.createElement('span');
+      star.classList.add('star');
+      if (isFilled) {
+        star.classList.add('on');
+      }
+      if (isHalf) {
+        star.classList.add('half');
+      }
+      return star;
     }
 
     // Function to generate stars
     function generateStars(data) {
 
-        let rating = data.rating;
+      let rating = data.rating;
 
-        let div = document.createElement("div");
+      let div = document.createElement("div");
 
-        // Clear previous stars
-        div.innerHTML = '';
+      // Clear previous stars
+      div.innerHTML = '';
 
-        // let p = document.createElement("p");
-        // p.textContent = "Rating: ";
-        // p.style.display = "inline"; // Set display to inline
-        // div.appendChild(p);
+      // let p = document.createElement("p");
+      // p.textContent = "Rating: ";
+      // p.style.display = "inline"; // Set display to inline
+      // div.appendChild(p);
 
-        // Calculate full stars
-        const fullStars = Math.floor(rating);
+      // Calculate full stars
+      const fullStars = Math.floor(rating);
 
-        // Calculate half star
-        const hasHalfStar = rating % 1 !== 0;
+      // Calculate half star
+      const hasHalfStar = rating % 1 !== 0;
 
-        // Generate full stars
-        for (let i = 0; i < fullStars; i++) {
-            const star = createStar(true, false);
-            div.appendChild(star);
-        }
+      // Generate full stars
+      for (let i = 0; i < fullStars; i++) {
+        const star = createStar(true, false);
+        div.appendChild(star);
+      }
 
-        // Generate half star
-        if (hasHalfStar) {
-            const halfStar = createStar(false, true);
-            div.appendChild(halfStar);
-        }
+      // Generate half star
+      if (hasHalfStar) {
+        const halfStar = createStar(false, true);
+        div.appendChild(halfStar);
+      }
 
-        // Generate empty stars
-        const emptyStars = numStars - fullStars - (hasHalfStar ? 1 : 0);
-        for (let i = 0; i < emptyStars; i++) {
-            const star = createStar(false, false);
-            div.appendChild(star);
-        }
+      // Generate empty stars
+      const emptyStars = numStars - fullStars - (hasHalfStar ? 1 : 0);
+      for (let i = 0; i < emptyStars; i++) {
+        const star = createStar(false, false);
+        div.appendChild(star);
+      }
 
-        let p = document.createElement("p");
-        p.textContent = ` (${data.review_count} reviews)`;
-        p.style.display = "inline"; // Set display to inline
-        div.appendChild(p);
-        
-        return div;
+      let p = document.createElement("p");
+      p.textContent = ` (${data.review_count} reviews)`;
+      p.style.display = "inline"; // Set display to inline
+      div.appendChild(p);
+
+      return div;
     }
 
-    function updateRestaurantInfoBox(restaurants) {
-      console.log(restaurants)
-        // const STAR_RATING = {
-        //   1: '★☆☆☆☆',
-        //   2: '★★☆☆☆',
-        //   3: '★★★☆☆',
-        //   3.5: '★★★½☆',
-        //   4: '★★★★☆',
-        //   4.5: '★★★★½',
-        //   5: '★★★★★'
-        // };
+    function updateRestaurantInfoBox(eateries) {
+      // const STAR_RATING = {
+      //   1: '★☆☆☆☆',
+      //   2: '★★☆☆☆',
+      //   3: '★★★☆☆',
+      //   3.5: '★★★½☆',
+      //   4: '★★★★☆',
+      //   4.5: '★★★★½',
+      //   5: '★★★★★'
+      // };
 
       const restaurantListDiv = d3.select('#restaurantList');
       restaurantListDiv.selectAll("*").remove();
 
+      if (eateries.length == 0) {
+        restaurantListDiv
+          .append('div')
+          .attr('class', 'restaurant-card')
+          .append('p')
+          .text("Nothing meets your criteria. Try increasing distance.")
+      } else {
+        // Bind data to restaurant cards
+        const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
+          .data(eateries.slice(0, 5)); // Limit to first 5 restaurants
 
+        // Enter selection - create new elements for restaurants
+        const newRestaurantCards = restaurantCards.enter()
+          .append('div')
+          .attr('class', 'restaurant-card');
 
-      // Bind data to restaurant cards
-      const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
-        .data(restaurants.slice(0, 5)); // Limit to first 5 restaurants
+        const anchorTags = newRestaurantCards
+          .style('color', 'inherit')
+          .style('text-decoration', 'none');
 
-      // Enter selection - create new elements for restaurants
-      const newRestaurantCards = restaurantCards.enter()
-        .append('div')
-        .attr('class', 'restaurant-card');
-
-      const anchorTags = newRestaurantCards.append('a')
-        .attr('href', d => d.url) // Set href attribute to the restaurant's URL
-        .attr('target', '_blank'); // Open link in a new tab
-
-      anchorTags.style('color', 'inherit')
-        .style('text-decoration', 'none');
-
-      // Append anchor tags to new restaurant cards
-      anchorTags.append('a')
-        .attr('href', d => d.url) // Set href attribute to the restaurant's URL
-        .attr('target', '_blank') // Open link in a new tab
-        .each(function (d) {
+        // Append anchor tags to new restaurant cards
+        anchorTags.each(function (d) {
           // For each anchor tag, append details of the restaurant
-          
+
           d3.select(this)
+            .append('a')
+            .attr('href', d => d.url) // Set href attribute to the restaurant's URL
+            .attr('target', '_blank') // Open link in a new tab
             .append('p')
             .attr('class', 'restaurant-name')
             .text(d => d.name);
 
           d3.select(this)
-          .append('div')
-          .node()
-          .appendChild(generateStars(d));
-            // .append('p')
-            // .text(d => `Rating: ${STAR_RATING[d.rating]}`);
+            .append('div')
+            .node()
+            .appendChild(generateStars(d));
+          // .append('p')
+          // .text(d => `Rating: ${STAR_RATING[d.rating]}`);
 
           // d3.select(this)
           //   .append('p')
@@ -1118,27 +1055,29 @@
             .text(d => `Snippet: ${d.snippet_text}`);
         });
 
-      // Update existing restaurant cards
-      restaurantCards.select('a')
-        .attr('href', d => d.url);
+        // Update existing restaurant cards
+        restaurantCards.select('a')
+          .attr('href', d => d.url);
 
-      // Remove excess restaurant cards
-      restaurantCards.exit().remove();
+        // Remove excess restaurant cards
+        restaurantCards.exit().remove();
+      }
 
 
 
-  /** TODO: TO THINK ABOUT WHEN NEXT PICKUP
-   *  a scroll bar to contain the resturants
-   * the category icons buttons!
-   * distance filter? 
-   * animation to smoothen transitions
-   * maybe switch the two buttons to a single toggle
-   * add the rating number next to the stars and the number of reviews in '()' next to the review number
-   *  create an distinction between "best of best" and "all results"
-   * add comment icon for the speech
-   * */
-}
+
+      /** TODO: TO THINK ABOUT WHEN NEXT PICKUP
+       *  a scroll bar to contain the resturants
+       * the category icons buttons!
+       * distance filter? 
+       * animation to smoothen transitions
+       * maybe switch the two buttons to a single toggle
+       * add the rating number next to the stars and the number of reviews in '()' next to the review number
+       *  create an distinction between "best of best" and "all results"
+       * add comment icon for the speech
+       * */
+    }
 
   </script>
-  
+
 </body>
