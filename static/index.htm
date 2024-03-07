@@ -232,13 +232,44 @@
       svgHist.append("g").call(xAxis);
 
 
+         // MAP
+        const projection = d3.geoMercator()
+        .scale(1 / (2 * Math.PI))
+        .translate([0, 0]);
+
+
+      const render = d3.geoPath(projection);
+
+      const tile = d3.tile()
+        .extent([[0, 0], [width, height]])
+        .tileSize(512)
+        .clampX(false);
+
+      const levels = svgMap.append("g")
+
+      
+        // .style('clip-path', "url(#circleClip)") //this clips the map to a circle
+        .attr("pointer-events", "none")
+        .selectAll("g")
+        .data(deltas)
+        .join("g")
+        .style("opacity", null); //set to 0.3 to see low resolution files
+
+
+
+ 
+
 
 
       let eateries = eateriesAll; //this is used for filtering
       let eateriesInRadius = eateriesAll; //this is used for best of best list
+      console.log(eateriesAll)
+      let topThreeEateries = eateriesInRadius.slice(0, 3); //top three best of best for the map
+      console.log(topThreeEateries)
+      topThreeEateries.forEach(d=> console.log(d.latitude + "," + d.longitude))
 
-      updateRestaurantInfoBox(eateriesInRadius);
 
+      // updateRestaurantInfoBox(eateriesInRadius,svgEateries, projection );
       // -----------------------
       // CATEGORY FILTER BUTTONS
       // -----------------------
@@ -325,24 +356,24 @@
 
         mi1_2_toggle = false;
         mi1_4_toggle = false;
-
         update_dist();
+        svgEateries.selectAll("circle.eateries").raise();
       });
       mi1_2.addEventListener('click', () => {
         mi1_2.classList.toggle('clicked');
         mi1_toggle = false;
         mi1_2_toggle = !mi1_2_toggle;
         mi1_4_toggle = false;
-
         update_dist();
+        svgEateries.selectAll("circle.eateries").raise();
       });
       mi1_4.addEventListener('click', () => {
         mi1_4.classList.toggle('clicked');
         mi1_toggle = false;
         mi1_2_toggle = false;
         mi1_4_toggle = !mi1_4_toggle;
-
         update_dist();
+        svgEateries.selectAll("circle.eateries").raise();
       });
 
       // set distance
@@ -375,27 +406,9 @@
         updateMyLocation();
       }
 
-      // MAP
-      const projection = d3.geoMercator()
-        .scale(1 / (2 * Math.PI))
-        .translate([0, 0]);
 
 
-      const render = d3.geoPath(projection);
-
-      const tile = d3.tile()
-        .extent([[0, 0], [width, height]])
-        .tileSize(512)
-        .clampX(false);
-
-      const levels = svgMap.append("g")
-        // .style('clip-path', "url(#circleClip)") //this clips the map to a circle
-        .attr("pointer-events", "none")
-        .selectAll("g")
-        .data(deltas)
-        .join("g")
-        .style("opacity", null); //set to 0.3 to see low resolution files
-
+        
       //myLocation
       let myCoordinates = {
         latitude: 42.36541856,
@@ -411,8 +424,8 @@
         .attr("transform", `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
 
       //Mouseover interaction
-      let tooltipWidth = 250;
-      let tooltipHeight = 45;
+      let tooltipWidth = 300;
+      let tooltipHeight = 60;
 
       let tooltip = svgMap.append("g")
         .attr("class", "tooltip")
@@ -439,7 +452,16 @@
         .attr("x", 10)
         .attr("y", 25);
 
+      let txtbest = tooltip.append("text")
+        .attr("fill", "black")
+        .attr("font-size", "smaller")
+        // .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 10)
+        .attr("y", 45);
+
       let svgEateries = svgMap.append("g");
+      let svgTopThree = svgEateries.append("g").attr("id", "top-three");
 
       //circles that represent eateries
       //set up colors 
@@ -455,12 +477,13 @@
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
         .on("mouseover", (event) => {
           tooltip.style("visibility", "visible");
+     
 
 
           let eatery = event.target.__data__
 
           //dynamically adjusts width, delete later
-          tooltipWidth = eatery['name'].length * 10
+          tooltipWidth = eatery['name'].length* 10
           if (tooltipWidth < 100) { tooltipWidth = 120; }
 
 
@@ -468,6 +491,7 @@
 
           txt.text(eatery['name']);
           txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']})`)
+          txtbest.text(" ")
 
           tooltip
             .raise();
@@ -476,6 +500,43 @@
         .on("mouseout", (event) => {
           tooltip.style("visibility", "hidden");
         });
+
+
+        // Add a new group for top three eateries
+
+        // console.log(topThreeEateries)
+
+          // let stars = svgEateries.selectAll("image")
+          //   .data(topThreeEateries)
+          //   .join("image")
+          //   .attr("xlink:href", "https://cdn0.iconfinder.com/data/icons/location-pin-4/2000/Best_Place-1024.png") // Replace with the path to your star icon or image
+          //   .attr("preserveAspectRatio", "xMidYMid meet")
+          //   .attr("width", 20) // Adjust the width as needed
+          //   .attr("height", 20) // Adjust the height as needed
+          //   .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
+          //   .on("mouseover", (event) => {
+          //   tooltip.style("visibility", "visible");
+
+          //   let eatery = event.target.__data__
+
+          //   //dynamically adjusts width, delete later
+          //   tooltipWidth = eatery['name'].length * 10
+          //   if (tooltipWidth < 100) { tooltipWidth = 120; }
+
+
+          //   box.attr("width", tooltipWidth)
+
+          //   txt.text(eatery['name']);
+          //   txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+          //   txtbest.text("Highly Recommended!!!")
+
+          //   tooltip
+          //     .raise();
+
+          // })
+          // .on("mouseout", (event) => {
+          //   tooltip.style("visibility", "hidden");
+          // });
       
 
       // //add location marker here:
@@ -559,7 +620,6 @@
           .attr("transform", (d) => `translate(${projection([myCoordinates.longitude,  myCoordinates.latitude])})`);
 
 
-
         //TODO: this needs new data, not just a color update
         circles.attr("fill", (d) => {
           d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
@@ -570,7 +630,9 @@
         })
 
         eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
-        updateRestaurantInfoBox(eateriesInRadius);
+        // updateRestaurantInfoBox(eateriesInRadius);
+        updateRestaurantInfoBox(eateriesInRadius,svgEateries, projection, tooltip,box,txt,txt2,txtbest);
+
 
       }
       var zoom = d3.zoom()
@@ -614,6 +676,15 @@
         circles
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
 
+        // let stars = updateRestaurantInfoBox(eateries,svgTopThree,projection,tooltip,box,txt,txt2,txtbest);
+        // console.log(stars);
+        // stars
+        //   .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`); 
+          let stars = svgTopThree.selectAll(".star-marker");
+          console.log(stars);
+        stars
+          .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`); 
+
         updateMyLocation();
       };
 
@@ -637,9 +708,14 @@
 
       //calls update on filters
       function updateData() {
-
-        // Filter the points using the filter dictionary first
+        // Filter the points using the filter dictionary first        console.log(topthree);
         eateries = eateriesAll.filter(d => pointPassesFilters(d));
+        eateries = eateriesAll.sort((a, b) => {
+
+              // Sort by rating descending
+              if (a.rating !== b.rating) {
+                return b.rating - a.rating;
+          }})
 
         console.log('filtered eateries', eateries);
         // console.log(eateries[0]["longitude"], eateries[0]["latitude"]);
@@ -656,7 +732,6 @@
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
           .on("mouseover", (event) => {
             tooltip.style("visibility", "visible");
-
 
             let eatery = event.target.__data__
 
@@ -677,6 +752,41 @@
           .on("mouseout", (event) => {
             tooltip.style("visibility", "hidden");
           });
+
+    
+          // console.log(topThreeEateries)
+
+        // let stars = svgEateries.selectAll("image")
+        //     .data(topThree)
+        //     .join("image")
+        //     .attr("xlink:href", "https://cdn0.iconfinder.com/data/icons/location-pin-4/2000/Best_Place-1024.png") // Replace with the path to your star icon or image
+        //     // .attr("preserveAspectRatio", "xMidYMid meet
+        //     .attr("width", 20) // Adjust the width as needed
+        //     .attr("height", 20) // Adjust the height as needed
+        //     .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
+        //     .on("mouseover", (event) => {
+        //     tooltip.style("visibility", "visible");
+
+        //     let eatery = event.target.__data__
+
+        //     //dynamically adjusts width, delete later
+        //     tooltipWidth = eatery['name'].length * 10
+        //     if (tooltipWidth < 100) { tooltipWidth = 120; }
+
+
+        //     box.attr("width", tooltipWidth)
+
+        //     txt.text(eatery['name']);
+        //     txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+
+        //     tooltip
+        //       .raise();
+
+        //   })
+        //   .on("mouseout", (event) => {
+        //     tooltip.style("visibility", "hidden");
+        //   });
+
 
 
       }
@@ -794,19 +904,12 @@
       return div;
     }
 
-    function updateRestaurantInfoBox(eateries) {
-      // const STAR_RATING = {
-      //   1: '★☆☆☆☆',
-      //   2: '★★☆☆☆',
-      //   3: '★★★☆☆',
-      //   3.5: '★★★½☆',
-      //   4: '★★★★☆',
-      //   4.5: '★★★★½',
-      //   5: '★★★★★'
-      // };
+    function updateRestaurantInfoBox(eateries,svgTopThree,projection,tooltip,box,txt,txt2,txtbest) {
 
-      const restaurantListDiv = d3.select('#restaurantList');
+      const restaurantListDiv = d3.select('#restaurantList')
       restaurantListDiv.selectAll("*").remove();
+
+      svgTopThree.selectAll(".star-marker").remove();
 
       if (eateries.length == 0) {
         restaurantListDiv
@@ -870,8 +973,78 @@
         restaurantCards.select('a')
           .attr('href', d => d.url);
 
+        let topThree= eateries.slice(0, 3);
+        console.log(topThree)
+
+        let stars = svgTopThree.selectAll("star-marker")
+            .data(topThree)
+                .join("image")
+                .attr("class", "star-marker")
+                .attr("xlink:href", "https://cdn0.iconfinder.com/data/icons/location-pin-4/2000/Best_Place-1024.png") // Replace with the path to your star icon or image
+                // .attr("preserveAspectRatio", "xMidYMid meet
+                .attr("width", 20) // Adjust the width as needed
+                .attr("height", 20) // Adjust the height as needed
+                .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
+                .on("mouseover", (event) => {
+                tooltip.style("visibility", "visible");
+
+                let eatery = event.target.__data__
+
+                //dynamically adjusts width, delete later
+                tooltipWidth = (eatery['name'].length+5) * 10
+                if (tooltipWidth < 100) { tooltipWidth = 120; }
+
+
+                box.attr("width", tooltipWidth)
+
+                txt.text(eatery['name']);
+                txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+                txtbest.text("Highly Recommended!")
+
+                tooltip
+                  .raise();
+
+              })
+              .on("mouseout", (event) => {
+                tooltip.style("visibility", "hidden");
+              });
+            
+        // let stars = svgEateries.selectAll("image")
+        //     .data(topThree)
+        //     .join("image")
+        //     .attr("xlink:href", "https://cdn0.iconfinder.com/data/icons/location-pin-4/2000/Best_Place-1024.png") // Replace with the path to your star icon or image
+        //     // .attr("preserveAspectRatio", "xMidYMid meet
+        //     .attr("width", 20) // Adjust the width as needed
+        //     .attr("height", 20) // Adjust the height as needed
+        //     .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
+        //     .on("mouseover", (event) => {
+        //     tooltip.style("visibility", "visible");
+
+        //     let eatery = event.target.__data__
+
+        //     //dynamically adjusts width, delete later
+        //     tooltipWidth = eatery['name'].length * 10
+        //     if (tooltipWidth < 100) { tooltipWidth = 120; }
+
+
+        //     box.attr("width", tooltipWidth)
+
+        //     txt.text(eatery['name']);
+        //     txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+
+        //     tooltip
+        //       .raise();
+
+        //   })
+        //   .on("mouseout", (event) => {
+        //     tooltip.style("visibility", "hidden");
+        //   });
+
+
         // Remove excess restaurant cards
         restaurantCards.exit().remove();
+
+        return stars
       }
 
 
