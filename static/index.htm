@@ -602,11 +602,6 @@
       // Clear previous stars
       div.innerHTML = '';
 
-      // let p = document.createElement("p");
-      // p.textContent = "Rating: ";
-      // p.style.display = "inline"; // Set display to inline
-      // div.appendChild(p);
-
       // Calculate full stars
       const fullStars = Math.floor(rating);
 
@@ -623,12 +618,6 @@
         div.appendChild(star);
 
       }
-
-      //       <span class="fa fa-star checked"></span>
-      // <span class="fa fa-star checked"></span>
-      // <span class="fa fa-star checked"></span>
-      // <span class="fa fa-star-half-full"></span>
-      // <span class="fa fa-star"></span>
 
       // Generate half star
       if (hasHalfStar) {
@@ -660,15 +649,6 @@
     }
 
     function updateRestaurantInfoBox(eateries) {
-      // const STAR_RATING = {
-      //   1: '★☆☆☆☆',
-      //   2: '★★☆☆☆',
-      //   3: '★★★☆☆',
-      //   3.5: '★★★½☆',
-      //   4: '★★★★☆',
-      //   4.5: '★★★★½',
-      //   5: '★★★★★'
-      // };
 
       const restaurantListDiv = d3.select('#restaurantList');
       restaurantListDiv.selectAll("*").remove();
