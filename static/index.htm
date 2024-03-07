@@ -163,8 +163,21 @@
       color: #7339D0
     }
 
+
     div.mapColumn {
       overflow-x: scroll;
+
+    .tick line {
+      visibility: hidden;
+    }
+
+    .tick text {
+      font-size: 16px
+    }
+
+    .domain {
+      visibility: hidden;
+
     }
   </style>
 
@@ -185,7 +198,7 @@
 
     <!-- RATING FILTER-->
     <h3>RATING</h3>
-    <svg id="histogram" width="275" height="100"></svg>
+    <svg id="histogram" width=300 height=160></svg>
 
     <!-- DISTANCE FILTER-->
     <h3>DISTANCE</h3>
@@ -255,6 +268,9 @@
     let url = (x, y, z) =>
       `https://api.mapbox.com/styles/v1/desaiwang/ckttxzrvq0s4i18l4he5vtltt/tiles/${z}/${x}/${y}${devicePixelRatio > 1 ? "@2x" : ""}?access_token=pk.eyJ1IjoiZGVzYWl3YW5nIiwiYSI6ImNrc2puMHIyaTJmbWsydG41bmljMWExdjIifQ.A4w7M2K7sSIN-uLuXarl_w`
 
+    //set up colors 
+    const selectedColor = "#7339D0";
+    const greyedoutColor = "#A5A0AC";
 
     const requestMapData = async () => {
 
@@ -263,7 +279,19 @@
       let filter_dist = Infinity;
 
       //eatery data
-      let eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
+      // let eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
+      let eateriesAll = await d3.csv("./yelp_boston_clean.csv", d3.autoType);
+
+      //parse search categories into proper list
+      eateriesAll.forEach((d) => {
+        // Remove the surrounding single quotes and convert the string into valid JSON
+        d["search category"] = JSON.parse(d["search category"].replace(/'/g, '"'));
+      }
+      );
+
+      // console.log(eateriesAll);
+
+      //sort by rating and reviews, this is the order of display for list view
       eateriesAll = eateriesAll.sort((a, b) => {
 
         // Sort by rating descending
@@ -275,24 +303,29 @@
         return b.review_count - a.review_count;
       });
 
+      let eateries = eateriesAll; //this is used for filtering
+      //filters that's placed on eateriesAll for current View
+      var filters = {};
+
       //set up histogram
-      const marginHist = ({ top: 5, right: 10, bottom: 40, left: 0 })
-      const widthHist = 275;
-      const heightHist = 120;
-      let bins = d3.bin().thresholds(4).value(d => d.rating)(eateriesAll);
-      console.log("bins", bins);
-      let barPadding = 5;
+
+      const marginHist = ({ top: 20, right: 20, bottom: 40, left: 20 })
+      const widthHist = 300;
+      const heightHist = 150;
+      let bins = d3.bin().thresholds([3, 3.5, 4, 4.5, 5]).value(d => d.rating)(eateriesAll);
+      // console.log("bins", bins);
+      let barPadding = 7;
       let svgHist = d3.select("#histogram");
 
       xScale = d3
         .scaleLinear()
-        .domain([bins[0].x0, bins[bins.length - 1].x1])
+        .domain([bins[0].x0, bins[bins.length - 1].x1 + 0.5])
         .range([marginHist.left, widthHist - marginHist.right])
 
       x = d3.scaleBand()
-        .domain([3.5, 4, 4.5, 5])
-        .range([marginHist.left, widthHist - marginHist.right])
-        .padding(0)
+        .domain([3.5, 4.0, 4.5, 5.0])
+        .range([marginHist.left - barPadding * 1.5, widthHist - marginHist.right + barPadding * 2])
+        .padding(0.3) //TODO: maybe set this instead of multiplying in Padding
 
       yScale = d3
         .scaleSymlog()
@@ -305,40 +338,64 @@
           .attr("transform", `translate(${0},${heightHist - marginHist.bottom})`)
           .call(
             d3.axisBottom(x)
-              .ticks(5)
+              .ticks(0)
               .tickSizeOuter(0)
+              .tickFormat(d3.format(".1f"))
           )
       };
 
-      svgHist
+      console.log(bins);
+      console.log(bins.length)
+
+      let ratinglist = [];
+
+      let histBars = svgHist
         .append("g")
-        .attr("fill", "#ddd")
         .selectAll("rect")
         .data(bins)
         .join("rect")
         .attr("x", d => xScale(d.x0) + barPadding) // position of each bar on xAxis, width adjustment (bar padding)
         .attr("y", d => yScale(d.length))
-        .attr("width", d => d3.max([0, xScale(d.x1) - xScale(d.x0) - barPadding]))
+        .attr("width", d => d3.max([0, xScale(4.5) - xScale(4) - barPadding]))
         .attr("height", d => yScale(0) - yScale(d.length))
+        .style("border-radius", "1px")
+        .style("outline", "solid")
+        .style("outline-color", greyedoutColor)
+        .attr("fill", "white")
         .on('mouseover', function (d, i) {
-          console.log(i);
-          d3.select(this).attr('style', 'fill: #e3d2fd; stroke: #7339D0; stroke-width: 2;');
-          d3.select("#toptext").text(`Metropolitan Areas: ${i.length}`);
+          if (!i.clicked) {
+            d3.select(this).attr("fill", "#EFE9F8")
+            d3.select(this).style('outline-color', selectedColor);
+          }
         })
         .on('mouseout', function (d, i) {
-          d3.select(this).attr('style', 'outline: thin solid clear;');
-          d3.select("#toptext").text(`Metropolitan Areas: ${0}`);
+          if (!i.clicked) {
+            d3.select(this).attr("fill", "white")
+            d3.select(this).style('outline-color', greyedoutColor)
+            //.attr('style', 'outline: thin solid clear;');
+          }
+        })
+        .on('click', function (d, i) {
+          i.clicked = !i.clicked
+
+          if (i.clicked) {
+            d3.select(this).attr("fill", "#EFE9F8")
+            d3.select(this).style('outline-color', selectedColor);
+
+            ratinglist.push(i.x0);
+            updateData();
+          } else {
+            d3.select(this).attr("fill", "white")
+            d3.select(this).style('outline-color', greyedoutColor)
+
+            ratinglist = ratinglist.filter(rating => rating != i.x0)
+            updateData();
+          }
         });
 
       svgHist.append("g").call(xAxis);
 
-
-
-
-      let eateries = eateriesAll; //this is used for filtering
       let eateriesInRadius = eateriesAll; //this is used for best of best list
-
-      updateRestaurantInfoBox(eateriesInRadius);
 
 
       // -----------------------
@@ -541,12 +598,11 @@
         .attr("x", 10)
         .attr("y", 25);
 
+      // let test = tooltip.append("g").attr("id", "stars");
+
       let svgEateries = svgMap.append("g");
 
       //circles that represent eateries
-      //set up colors 
-      const selectedColor = "#7339D0";
-      const greyedoutColor = "#A5A0AC";
 
       let circles = svgEateries.selectAll("circle.eateries").data(eateries)
         .join("circle")
@@ -555,21 +611,22 @@
         .attr("fill", selectedColor)
         .attr("opacity", 0.9)
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
-        .on("mouseover", (event) => {
+        .on("mouseover", (d, i) => {
           tooltip.style("visibility", "visible");
 
 
-          let eatery = event.target.__data__
+          let eatery = i
+          console.log(i);
 
           //dynamically adjusts width, delete later
           tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 100) { tooltipWidth = 120; }
+          if (tooltipWidth < 200) { tooltipWidth = 120; }
 
 
           box.attr("width", tooltipWidth)
 
           txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']})`)
+          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
 
           tooltip
             .raise();
@@ -619,19 +676,7 @@
           .attr("r", radius)
           .attr("transform", (d) => `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
 
-
-
-        //TODO: this needs new data, not just a color update
-        circles.attr("fill", (d) => {
-          d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
-          if (d.dist < filter_dist) {
-            return selectedColor
-          }
-          else { return greyedoutColor }
-        })
-
-        eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
-        updateRestaurantInfoBox(eateriesInRadius);
+        updateData();
 
       }
       var zoom = d3.zoom()
@@ -678,9 +723,6 @@
         updateMyLocation();
       };
 
-      //from INFO3300 notes, makes brush histogram filter
-
-      var filters = {};
 
       function pointPassesFilters(point) {
 
@@ -699,6 +741,10 @@
       //calls update on filters
       function updateData() {
 
+        //update filterRating
+        let filterRating = d => ratinglist.includes(d['rating']);
+        filters['rating'] = filterRating;
+
         // Filter the points using the filter dictionary first
         eateries = eateriesAll.filter(d => pointPassesFilters(d));
 
@@ -707,40 +753,62 @@
         // console.log(projection([eateries[0]["longitude"], eateries[0]["latitude"]]));
         // console.log(projection([-71.05686665, 42.35140831]));
 
+        eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
+        updateRestaurantInfoBox(eateriesInRadius);
+
         // Draw the circles
         circles = svgEateries.selectAll("circle.eateries").data(eateries)
           .join("circle")
           .attr("class", "eateries")
           .attr("r", 3)
-          .attr("fill", selectedColor)
+          .attr("fill", (d) => {
+            d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
+            if (d.dist < filter_dist) {
+              return selectedColor
+            }
+            else { return greyedoutColor }
+          })
           .attr("opacity", 0.9)
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
-          .on("mouseover", (event) => {
+          .on("mouseover", (e, d) => {
             tooltip.style("visibility", "visible");
 
-
-            let eatery = event.target.__data__
-
             //dynamically adjusts width, delete later
-            tooltipWidth = eatery['name'].length * 10
-            if (tooltipWidth < 100) { tooltipWidth = 120; }
+            tooltipWidth = d['name'].length * 10
+            if (tooltipWidth < 200) { tooltipWidth = 200; }
 
 
             box.attr("width", tooltipWidth)
 
-            txt.text(eatery['name']);
-            txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+            txt.text(d['name']);
+            txt2.text(`Rating: ${d['rating']} (${d['review_count']} reviews)`)
+
+
 
             tooltip
               .raise();
+            // test.node().appendChild(generateStars(d)).raise();
 
           })
           .on("mouseout", (event) => {
+            // test.selectAll("*").remove()
             tooltip.style("visibility", "hidden");
           });
 
 
       }
+
+      //dispatch some simulated click events so histograms are clicked upon web launch
+      histBars.each(function () {
+        let e = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        this.dispatchEvent(e);
+      })
+      //same with mile1 button
+      mi1.click();
 
     }
 
@@ -798,11 +866,6 @@
       // Clear previous stars
       div.innerHTML = '';
 
-      // let p = document.createElement("p");
-      // p.textContent = "Rating: ";
-      // p.style.display = "inline"; // Set display to inline
-      // div.appendChild(p);
-
       // Calculate full stars
       const fullStars = Math.floor(rating);
 
@@ -819,12 +882,6 @@
         div.appendChild(star);
 
       }
-
-      //       <span class="fa fa-star checked"></span>
-      // <span class="fa fa-star checked"></span>
-      // <span class="fa fa-star checked"></span>
-      // <span class="fa fa-star-half-full"></span>
-      // <span class="fa fa-star"></span>
 
       // Generate half star
       if (hasHalfStar) {
@@ -857,15 +914,6 @@
     }
 
     function updateRestaurantInfoBox(eateries) {
-      // const STAR_RATING = {
-      //   1: '★☆☆☆☆',
-      //   2: '★★☆☆☆',
-      //   3: '★★★☆☆',
-      //   3.5: '★★★½☆',
-      //   4: '★★★★☆',
-      //   4.5: '★★★★½',
-      //   5: '★★★★★'
-      // };
 
       const restaurantListDiv = d3.select('#restaurantList');
       restaurantListDiv.selectAll("*").remove();
@@ -906,18 +954,13 @@
             .append('div')
             .node()
             .appendChild(generateStars(d));
-          // .append('p')
-          // .text(d => `Rating: ${STAR_RATING[d.rating]}`);
-
-          // d3.select(this)
-          //   .append('p')
-          //   .text(d => `Review Count: ${d.review_count}`);
 
           const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
+
           d3.select(this)
             .append('p')
             .attr('class', 'categoryStyle')
-            .text(`${categories}`);
+            .text(`Categories: ${d['search category'].join(', ')}`); //use categories if want to see categories_json
 
           const locationInfo = JSON.parse(d.location_json);
           d3.select(this)
