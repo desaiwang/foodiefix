@@ -55,6 +55,12 @@
       color: #7339D0;
     }
 
+    h3.withRule {
+      border-top: 1px solid #ccc; 
+      padding-top: 12px; 
+      margin-top: 15px;
+    }
+
     h3#best {
       font-weight: 800;
       font-size: 1.1em;
@@ -127,7 +133,7 @@
       border-right: 0;
       border-left: 0;
       border-bottom: 1px solid white;      
-      font-size: 1em;
+      font-size: .95em;
       font-weight: 500;
       color: #7339D0;
     }
@@ -243,7 +249,7 @@
         <svg id="histogram" width=300 height=125></svg>
 
         <!-- DISTANCE FILTER-->
-        <h3>DISTANCE</h3>
+        <h3 class="withRule">DISTANCE</h3>
         <div id="distance">
           <button id="mi1_4">.25 mi</button>
           <button id="mi1_2">.5 mi</button>
@@ -251,7 +257,7 @@
         </div>
 
         <!-- CATEGORY FILTER-->
-        <h3>CATEGORY</h3>
+        <h3 class="withRule">CATEGORY</h3>
         <button id="selectAllButton" value="selectAll">SELECT ALL</button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<button id="resetButton" value="reset">RESET</button>
 
         <div id="category">
