@@ -23,7 +23,8 @@
     body {
       font-family: 'Barlow', 'Helvetica', sans-serif;
       font-weight: 400;
-      margin: 0 0 0 100px;
+      margin: 0 0 0 50px;
+      padding: 0;
       overflow: hidden;
     }
 
@@ -70,14 +71,21 @@
     }
 
     .flex-container {
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-wrap: nowrap;
     }
 
     div.filterColumn {
-      margin: 10 10 10 30;
-      padding: 0;
+      margin: 0;
+      padding: 10px 10px 10px 30px;
+      min-width: 275px;
       max-width: 275px;
+    }
+    div.filterButtonContainer {
+      height: calc(100vh - 170px);
+      overflow-y: scroll;
     }
 
     button {
@@ -103,14 +111,15 @@
     }
 
     div.restaurant-list-info {
-      max-width: 450px;
+      max-width: 400px;
+      min-width: 300px;
       margin: 0; 
       padding: 145px 20px 0 15px;
     }
     .restaurant-list {
+      height: calc(100vh - 240px);
       margin: 0;
       padding: 5px 20px 10px 10px;
-      height: 100vh;
       overflow-y: scroll;
     }
     .restaurant-list a {
@@ -155,8 +164,7 @@
     }
 
     div.mapColumn {
-      height: 100vh;
-      overflow: hidden;
+      overflow-x: scroll;
     }
   </style>
 
@@ -173,6 +181,8 @@
 
     <h2>FILTERS</h2>
 
+    <div class="filterButtonContainer">
+
     <!-- RATING FILTER-->
     <h3>RATING</h3>
     <svg id="histogram" width="275" height="100"></svg>
@@ -180,8 +190,8 @@
     <!-- DISTANCE FILTER-->
     <h3>DISTANCE</h3>
     <div id="distance">
-      <button id="mi0.25"">0.25 mi</button>
-      <button id="mi0.5">0.5 mi</button>
+      <button id="mi0.25"">.25 mi</button>
+      <button id="mi0.5">.5 mi</button>
       <button id="mi1">1 mi</button>
     </div>
 
@@ -207,6 +217,8 @@
         <button id="c17" value="thai">thai</button>        
         <button id="c18" value="vietnamese">vietnamese</button>        
     </div>
+
+    </div>
   </div>
 
   <!-- LIST -->
@@ -218,7 +230,7 @@
 
   <!-- MAP -->
   <div class="mapColumn" >
-    <svg id="svgMap" width="700" height="1000">
+    <svg id="svgMap" width="650" height="1100">
       <defs>
         <clipPath id="circleClip">
           <circle cx="250" cy="250" r="200" />
