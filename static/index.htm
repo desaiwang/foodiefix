@@ -3,148 +3,237 @@
 <head>
   <title>INFO 4310 - HW3</title>
   <!-- TODO-C: temp styles from old assignment, feel free to update -->
-  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="./style.css" rel="stylesheet" type="text/css">
+  <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+  <!-- <link href="./style.css" rel="stylesheet" type="text/css"> -->
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-tile@1"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  
+
   <style>
-    .row {
-      display: flex;
-      flex-direction: row;
-      justify-content: center
+
+    body {
+      font-family: 'Barlow', 'Helvetica', sans-serif;
+      font-weight: 400;
+      margin: 0 0 0 100px;
+      overflow: hidden;
     }
 
-    .restaurant-info-box {
-      max-width: 30em;
-      background-color: #f9f9f9;
-      padding: 5px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      margin-top: -20px;
+    h1 {
+      font-weight: 800;
+      font-size: 3em;
+      margin: 20px 0 0 0;
+      padding: 0;
+      background: linear-gradient(to right, #7339D0, #d81289);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;      
     }
-
-    .restaurant-list {
-      margin-top: 10px;
-
-    }
-
-    .restaurant-list a {
-      text-decoration: none !important;
-      color: inherit;
-    }
-
-    .restaurant-item {
-      margin-bottom: 10px;
-    }
-
-    .restaurant-item p {
+    h2 {
+      font-weight: 700;
+      font-size: 1em;
       margin: 0;
+      padding: 0 0 5px 0;
+      color: #777;
+      border-bottom: 1px solid #777;
+    }
+    h3 {
+      font-weight: 700;
+      font-size: 1em;
+      margin: 0;
+      padding: 20px 0 15px 0;
+      color: #7339D0;
+    }
+    h3#best {
+      font-weight: 800;
+      font-size: 1.1em;
+      color: #d81289;
+    }
+    p {
+      margin: 0;
+      padding: 3px 0;
+      line-height: 1.3em;
+    }
+    p#tagline {
+      font-size: 1.1em;
+      color: #7339D0;
+      margin: 0;
+      padding: 0 0 35 0;
     }
 
-    .restaurant-card {
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      margin-bottom: 8px;
-      background-color: #f9f9f9;
-      font-size: medium;
-    }
-
-    .restaurant-name {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-
-    .column {
+    .flex-container {
       display: flex;
-      flex-direction: column;
+      flex-wrap: nowrap;
+    }
+
+    div.filterColumn {
+      margin: 10 10 10 30;
+      padding: 0;
+      max-width: 275px;
     }
 
     button {
       background-color: #ffffff;
-      /* Green */
-      border: 2px solid #8a8a8a;
-      color: #8a8a8a;
-      border-radius: 10px;
-      padding: 5px 10px;
+      border: 2px solid #777;
+      color: #777;
+      border-radius: 20px;
+      margin:  0 7px 10px 0;
+      padding: 8px 10px;
+      font-size: 1em;
+      font-weight: 600;
     }
-
-    .clicked {
+    .clicked, button:hover {
       background-color: #e3d2fd;
-      /* Green */
       border: 2px solid #7339D0;
       color: #7339D0;
-      border-radius: 10px;
-      padding: 5px 10px;
+    }
+    #distance button {
+      width: 80px;
+    }
+    #category button {
+      width: 125px;
+    }
+
+    div.restaurant-list-info {
+      max-width: 450px;
+      margin: 0; 
+      padding: 145px 20px 0 15px;
+    }
+    .restaurant-list {
+      margin: 0;
+      padding: 5px 20px 10px 10px;
+      height: 100vh;
+      overflow-y: scroll;
+    }
+    .restaurant-list a {
+      text-decoration: none !important;
+      color: inherit;
+    }
+    .restaurant-item {
+      margin-bottom: 10px;
+    }
+    .restaurant-card {
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      padding: 20px 30px;
+      margin: 0 0 13px 0;
+      font-size: medium;
+      box-shadow: 0 0 7px #ccc;
+    }
+    .restaurant-card p.categoryStyle {
+      color: #7339D0;
+      font-weight: 600;
+    }
+    .restaurant-card p.snippetStyle {
+      margin: 0 0 0 23px;
+      text-indent: -23px;
+      font-style: italic;
+    }    
+    .restaurant-name {
+      font-size: 1.25em;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
     }
 
     .fa-star-o {
       color: #7339D0
     }
-
     .fa.checked {
       color: #7339D0
     }
-
     .fa-star-half-full {
       color: #7339D0
+    }
+
+    div.mapColumn {
+      height: 100vh;
+      overflow: hidden;
     }
   </style>
 
 </head>
-<div class="row">
-  <svg id="svgMap" width="600" height="600">
-    <defs>
-      <clipPath id="circleClip">
-        <circle cx="250" cy="250" r="200" />
-      </clipPath>
-    </defs>
-  </svg>
-
-  <div class="column" style="margin: 10px;">
-    <svg id="histogram" width=500 height=120></svg>
-
-    <div id="distance" style="margin-bottom: 20px;">
-      <p><button id="mi0.25" style="margin-left:1em;"> 0.25 mi</button>
-        <button id="mi0.5" style="margin-left:1em;"> 0.5 mi</button>
-        <button id="mi1" style="margin-left:1em;"> 1 mi</button>
-      </p>
-      <p>
-        <button id = "c01" style = "margin-left:1em;" value="restaurants">restaurants</button>
-        <button id = "c02" style = "margin-left:1em;" value="cafes">cafes</button>
-        <button id = "c03" style = "margin-left:1em;" value="coffee">coffee</button>
-        <button id = "c04" style = "margin-left:1em;" value="sandwiches">sandwiches</button>
-        <button id = "c05" style = "margin-left:1em;" value="sushi">sushi</button>
-        <button id = "c06" style = "margin-left:1em;" value="pizza">pizza</button>
-        <button id = "c07" style = "margin-left:1em;" value="donuts">donuts</button>
-        <button id = "c08" style = "margin-left:1em;" value="bakeries">bakeries</button>
-        <button id = "c09" style = "margin-left:1em;" value="ethnicmarkets">ethnic</button>
-        <button id = "c10" style = "margin-left:1em;" value="newamerican">american</button>
-        <button id = "c11" style = "margin-left:1em;" value="chinese">chinese</button>
-        <button id = "c12" style = "margin-left:1em;" value="french">french</button>        
-        <button id = "c13" style = "margin-left:1em;" value="inkpak">inkpak</button>        
-        <button id = "c14" style = "margin-left:1em;" value="italian">italian</button>        
-        <button id = "c15" style = "margin-left:1em;" value="japanese">japanese</button>        
-        <button id = "c16" style = "margin-left:1em;" value="mexican">mexican</button>        
-        <button id = "c17" style = "margin-left:1em;" value="thai">thai</button>        
-        <button id = "c18" style = "margin-left:1em;" value="vietnamese">vietnamese</button>        
-      </p>
-    </div>
-
-    <div id="restaurantInfoBox" class="restaurant-info-box">
-      <h2>Restaurants Near You </h2>
-      <div id="restaurantList" class="restaurant-list"></div>
-    </div>
-  </div>
-</div>
-
 
 <body>
 
+<div class="flex-container">
+
+  <!-- FILTERS -->
+  <div class="filterColumn">
+    <h1><img src="logo.png" width="35"> Foodie<span style="font-weight:400;">fix</span></h1>
+    <p id="tagline">Find the best restaurants near me</p>
+
+    <h2>FILTERS</h2>
+
+    <!-- RATING FILTER-->
+    <h3>RATING</h3>
+    <svg id="histogram" width="275" height="100"></svg>
+
+    <!-- DISTANCE FILTER-->
+    <h3>DISTANCE</h3>
+    <div id="distance">
+      <button id="mi0.25"">0.25 mi</button>
+      <button id="mi0.5">0.5 mi</button>
+      <button id="mi1">1 mi</button>
+    </div>
+
+    <!-- CATEGORY FILTER-->
+    <h3>CATEGORY</h3>
+    <div id="category">
+        <button id="c01" value="restaurants">restaurants</button>
+        <button id="c02" value="cafes">cafes</button>
+        <button id="c03" value="coffee">coffee</button>
+        <button id="c04" value="sandwiches">sandwiches</button>
+        <button id="c05" value="sushi">sushi</button>
+        <button id="c06" value="pizza">pizza</button>
+        <button id="c07" value="donuts">donuts</button>
+        <button id="c08" value="bakeries">bakeries</button>
+        <button id="c09" value="ethnicmarkets">ethnic</button>
+        <button id="c10" value="newamerican">american</button>
+        <button id="c11" value="chinese">chinese</button>
+        <button id="c12" value="french">french</button>        
+        <button id="c13" value="inkpak">inkpak</button>        
+        <button id="c14" value="italian">italian</button>        
+        <button id="c15" value="japanese">japanese</button>        
+        <button id="c16" value="mexican">mexican</button>        
+        <button id="c17" value="thai">thai</button>        
+        <button id="c18" value="vietnamese">vietnamese</button>        
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div id="restaurantInfoBox" class="restaurant-list-info">
+      <h2>RESTAURANTS NEAR ME</h2>
+      <h3 id="best">BEST OF BEST</h3>
+      <div id="restaurantList" class="restaurant-list"></div>
+  </div>
+
+  <!-- MAP -->
+  <div class="mapColumn" >
+    <svg id="svgMap" width="600" height="1000">
+      <defs>
+        <clipPath id="circleClip">
+          <circle cx="250" cy="250" r="200" />
+        </clipPath>
+      </defs>
+    </svg>
+  </div>
+
+</div>
+
+
+
+<!-- ==================
+        MAP SCRIPT
+    =================== -->
   <script id="map">
     const svgMap = d3.select("#svgMap");
     const width = svgMap.attr("width");
@@ -175,12 +264,12 @@
       });
 
       //set up histogram
-      const marginHist = ({ top: 20, right: 20, bottom: 40, left: 20 })
-      const widthHist = 200;
-      const heightHist = 100;
+      const marginHist = ({ top: 5, right: 10, bottom: 40, left: 0 })
+      const widthHist = 275;
+      const heightHist = 120;
       let bins = d3.bin().thresholds(4).value(d => d.rating)(eateriesAll);
       console.log("bins", bins);
-      let barPadding = 1;
+      let barPadding = 5;
       let svgHist = d3.select("#histogram");
 
       xScale = d3
@@ -191,7 +280,7 @@
       x = d3.scaleBand()
         .domain([3.5, 4, 4.5, 5])
         .range([marginHist.left, widthHist - marginHist.right])
-        .padding(0.3)
+        .padding(0)
 
       yScale = d3
         .scaleSymlog()
@@ -211,7 +300,7 @@
 
       svgHist
         .append("g")
-        .attr("fill", "steelblue")
+        .attr("fill", "#ddd")
         .selectAll("rect")
         .data(bins)
         .join("rect")
@@ -221,7 +310,7 @@
         .attr("height", d => yScale(0) - yScale(d.length))
         .on('mouseover', function (d, i) {
           console.log(i);
-          d3.select(this).attr('style', 'fill: orange;');
+          d3.select(this).attr('style', 'fill: #e3d2fd; stroke: #7339D0; stroke-width: 2;');
           d3.select("#toptext").text(`Metropolitan Areas: ${i.length}`);
         })
         .on('mouseout', function (d, i) {
@@ -749,6 +838,7 @@
       let p = document.createElement("p");
       p.textContent = ` (${data.review_count} reviews)`;
       p.style.display = "inline"; // Set display to inline
+      p.style.color = "#555"
       div.appendChild(p);
 
       return div;
@@ -814,16 +904,18 @@
           const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
           d3.select(this)
             .append('p')
-            .text(`Categories: ${categories}`);
+            .attr('class', 'categoryStyle')
+            .text(`${categories}`);
 
           const locationInfo = JSON.parse(d.location_json);
           d3.select(this)
             .append('p')
-            .text(`Address: ${locationInfo.display_address.join(', ')}`);
+            .text(`${locationInfo.display_address.join(', ')}`);
 
           d3.select(this)
             .append('p')
-            .text(d => `Snippet: ${d.snippet_text}`);
+            .attr('class', 'snippetStyle')
+            .text(d => `💬 "${d.snippet_text}"`);
         });
 
         // Update existing restaurant cards
