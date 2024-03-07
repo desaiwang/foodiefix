@@ -135,10 +135,12 @@
 
     button:hover {
       text-decoration: underline dotted;
+      text-underline-offset: 3px;
     }
 
     .clicked:hover {
       text-decoration: underline;
+      text-underline-offset: 3px;
     }
     
     #distance button {
@@ -163,6 +165,7 @@
       border: 0;
       border-radius: 0;
       text-decoration: underline dotted;
+      text-underline-offset: 3px;
     }    
 
     div.restaurant-list-info {
@@ -212,9 +215,18 @@
     }
 
     .restaurant-card p.snippetStyle {
-      margin: 5px 0 0 23px;
-      text-indent: -23px;
+      margin: 5px 0 0 30px;
+      text-indent: 0;
       font-style: italic;
+    }
+
+    .restaurant-card p.snippetStyle::before {
+      content: url('snippet.svg');
+      width: 24px;
+      margin: 0 0 0 -28px;
+      padding: 0;
+      display:inline-block;
+        /* border: 1px solid red; */
     }
 
     .restaurant-name {
@@ -1093,7 +1105,7 @@
     d3.select(this)
       .append('p')
       .attr('class', 'snippetStyle')
-      .text(d => `💬 "${d.snippet_text}"`);
+      .text(d => `"${d.snippet_text}"`);
   });
 
     // Update existing restaurant cards
