@@ -17,6 +17,10 @@
 
 
   <style>
+    *{
+      overflow-anchor: none;
+    }
+
     body {
       font-family: 'Barlow', 'Helvetica', sans-serif;
       font-weight: 400;
@@ -25,6 +29,7 @@
       min-width: 1400px;
       overflow-x: scroll;
       overflow-y: hidden;
+      overscroll-behavior-x: none;
     }
 
     h1 {
@@ -109,15 +114,33 @@
       padding: 6px 10px 8px 10px;
       font-size: 1em;
       font-weight: 600;
+      cursor: pointer;
     }
 
-    .clicked,
-    button:hover {
+    /* button[value="cafes"]::before {
+      content: "#";
+      color: gray;
+    }
+    .clicked[value="cafes"]::before {
+      content: url("logo.png");
+      content: "#";
+      color: purple;
+    }     */
+
+    .clicked {
       background-color: #e3d2fd;
       border: 2px solid #7339D0;
       color: #7339D0;
     }
 
+    button:hover {
+      text-decoration: underline dotted;
+    }
+
+    .clicked:hover {
+      text-decoration: underline;
+    }
+    
     #distance button {
       width: 80px;
     }
@@ -129,10 +152,7 @@
     button#selectAllButton, button#resetButton  {
       margin: 0 0 12px 0;
       padding: 0;
-      border-top: 0;
-      border-right: 0;
-      border-left: 0;
-      border-bottom: 1px solid white;      
+      border: 0;
       font-size: .95em;
       font-weight: 500;
       color: #7339D0;
@@ -140,11 +160,9 @@
 
     #selectAllButton:hover, #resetButton:hover  {
       background-color: white;
-      border-top: 0;
-      border-right: 0;
-      border-left: 0;
-      border-bottom: 1px solid;
+      border: 0;
       border-radius: 0;
+      text-decoration: underline dotted;
     }    
 
     div.restaurant-list-info {
@@ -180,11 +198,11 @@
     }
 
     .restaurant-card div.categoryDivStyle {
-      margin: 6px 0 3px 0;
+      margin: 6px 0 8px 0;
     }
     .restaurant-card span.categoryStyle {
       margin: 2px 5px 2px 0;
-      padding: 2px 6px;
+      padding: 2px 6px 4px 6px;
       border: 1px solid #7339D0;
       color: #7339D0;
       font-weight: 600;
@@ -217,7 +235,6 @@
     .fa-star-half-full {
       color: #7339D0
     }
-
 
     div.mapColumn {
       overflow-x: scroll;
@@ -282,7 +299,7 @@
           <button id="c10" value="newamerican">american</button>
           <button id="c11" value="chinese">chinese</button>
           <button id="c12" value="french">french</button>
-          <button id="c13" value="inkpak">inkpak</button>
+          <button id="c13" value="indpak">indpak</button>
           <button id="c14" value="italian">italian</button>
           <button id="c15" value="japanese">japanese</button>
           <button id="c16" value="mexican">mexican</button>
@@ -421,33 +438,43 @@
         .style("outline", "solid")
         .style("outline-color", greyedoutColor)
         .attr("fill", "white")
-        .on('mouseover', function (d, i) {
-          if (!i.clicked) {
-            d3.select(this).attr("fill", "#EFE9F8") 
-            d3.select(this).style('outline-color', selectedColor);
+        .attr("cursor", "pointer")
+        .on('mouseover', function (event, d) {
+          console.log(event, d)
+          if (!d.clicked) {
+            d3.select(this).attr("fill", "white").style("outline-width", "medium") 
+            //d3.select(this).style('outline-color', greyedoutColor);
+          }
+          else {
+            d3.select(this).attr("fill", "#EFE9F8").style("outline-width", "medium") 
+            //d3.select(this).style('outline-color', selectedColor);            
           }
         })
-        .on('mouseout', function (d, i) {
-          if (!i.clicked) {
-            d3.select(this).attr("fill", "white")
+        .on('mouseout', function (event, d) {
+          if (!d.clicked) {
+            d3.select(this).attr("fill", "white").style("outline-width", "thin") 
             d3.select(this).style('outline-color', greyedoutColor)
             //.attr('style', 'outline: thin solid clear;');
           }
+          else {
+            d3.select(this).attr("fill", "#EFE9F8").style("outline-width", "thin") 
+            d3.select(this).style('outline-color', selectedColor);            
+          }
         })
-        .on('click', function (d, i) {
-          i.clicked = !i.clicked
+        .on('click', function (event, d) {
+          d.clicked = !d.clicked
 
-          if (i.clicked) {
+          if (d.clicked) {
             d3.select(this).attr("fill", "#EFE9F8")
             d3.select(this).style('outline-color', selectedColor);
 
-            ratinglist.push(i.x0);
+            ratinglist.push(d.x0);
             updateData();
           } else {
             d3.select(this).attr("fill", "white")
             d3.select(this).style('outline-color', greyedoutColor)
 
-            ratinglist = ratinglist.filter(rating => rating != i.x0)
+            ratinglist = ratinglist.filter(rating => rating != d.x0)
             updateData();
           }
         });
