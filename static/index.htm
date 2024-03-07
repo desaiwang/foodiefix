@@ -364,8 +364,8 @@
           )
       };
 
-      console.log(bins);
-      console.log(bins.length)
+      // console.log(bins);
+      // console.log(bins.length)
 
       let ratinglist = [];
 
@@ -449,15 +449,13 @@
 
             // add the button value to our new array
             category_filter.push(category_button.value);
-
+            updateData();
             // Otherwise user unselected the button
           } else {
             // remove the button value from the array
             category_filter = category_filter.filter(item => item != category_button.value);
+            updateData();
           }
-
-          // testing: print new array
-          console.log(category_filter);
         });
       };
 
@@ -766,6 +764,20 @@
         let filterRating = d => ratinglist.includes(d['rating']);
         filters['rating'] = filterRating;
 
+        let filterCategory = d => {
+          for (let value of d['search category']) {
+            if (category_filter.includes(value)) {
+              return true;
+            }
+          }
+          return false;
+        };
+
+        filters['search category'] = filterCategory;
+
+        // testing: print new array
+        console.log("filtering inside updateData()", category_filter);
+
         // Filter the points using the filter dictionary first
         eateries = eateriesAll.filter(d => pointPassesFilters(d));
 
@@ -774,8 +786,6 @@
         // console.log(projection([eateries[0]["longitude"], eateries[0]["latitude"]]));
         // console.log(projection([-71.05686665, 42.35140831]));
 
-        eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
-        updateRestaurantInfoBox(eateriesInRadius);
 
         // Draw the circles
         circles = svgEateries.selectAll("circle.eateries").data(eateries)
@@ -816,6 +826,10 @@
             tooltip.style("visibility", "hidden");
           });
 
+
+        eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
+        console.log("updating eateriesInRadius", eateriesInRadius);
+        updateRestaurantInfoBox(eateriesInRadius);
 
       }
 
