@@ -525,11 +525,15 @@
       //   .attr("opacity", 1);
 
       myLocation.append("image")
-        .attr('width', 20)
-        .attr('height', 20)
-        .attr("xlink:href", 'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png');
-
-
+        .attr('width', 25)
+        .attr('height', 25)
+        .attr("xlink:href", 'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png')
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("x", -10)  // Adjust x position to center the image
+        .attr("y", -15); // Adjust y position to center the image
+        
+        // .attr("xlink:href", 'https://cdn0.iconfinder.com/data/icons/aami-flat-map-pins-and-navigation/64/location-06-1024.png');
+          //https://cdn0.iconfinder.com/data/icons/aami-flat-map-pins-and-navigation/64/location-06-1024.png
 
 
 
@@ -541,16 +545,18 @@
         // console.log("distance: ", getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, myCoordinates.latitude + latdiff_1mile * 3, myCoordinates.longitude))
 
         let screen_myLocation = projection([myCoordinates.longitude, myCoordinates.latitude]);
-        let screen_radiusEnd = projection([myCoordinates.longitude, myCoordinates.latitude + curr_latdiff]);
+        let screen_radiusEnd = projection([myCoordinates.longitude, myCoordinates.latitude + curr_latdiff ]);
         let radius = screen_myLocation[1] - screen_radiusEnd[1];
         // console.log("mypt:", screen_myLocation)
         // console.log("1mile pt:", screen_radiusEnd)
         // console.log("dist radius", radius)
 
+
+
         myLocation.attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
         radiusBuffer
           .attr("r", radius)
-          .attr("transform", (d) => `translate(${projection([myCoordinates.longitude, myCoordinates.latitude])})`);
+          .attr("transform", (d) => `translate(${projection([myCoordinates.longitude,  myCoordinates.latitude])})`);
 
 
 
