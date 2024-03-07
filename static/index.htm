@@ -2,9 +2,6 @@
 
 <head>
   <title>INFO 4310 - HW3</title>
-  <!-- TODO-C: temp styles from old assignment, feel free to update -->
-  <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
   <!-- <link href="./style.css" rel="stylesheet" type="text/css"> -->
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -20,12 +17,19 @@
 
 
   <style>
+    * {
+      overflow-anchor: none;
+    }
+
     body {
       font-family: 'Barlow', 'Helvetica', sans-serif;
       font-weight: 400;
       margin: 0 0 0 50px;
       padding: 0;
-      overflow: hidden;
+      min-width: 1400px;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      overscroll-behavior-x: none;
     }
 
     h1 {
@@ -50,15 +54,21 @@
 
     h3 {
       font-weight: 700;
-      font-size: 1em;
+      font-size: 1.05em;
       margin: 0;
       padding: 20px 0 15px 0;
       color: #7339D0;
     }
 
+    h3.withRule {
+      border-top: 1px solid #ccc;
+      padding-top: 12px;
+      margin-top: 15px;
+    }
+
     h3#best {
       font-weight: 800;
-      font-size: 1.1em;
+      font-size: 1.15em;
       color: #d81289;
     }
 
@@ -95,21 +105,42 @@
     }
 
     button {
+      font-family: 'Barlow', 'Helvetica', sans-serif;
       background-color: #ffffff;
       border: 2px solid #777;
       color: #777;
       border-radius: 20px;
       margin: 0 7px 10px 0;
-      padding: 8px 10px;
+      padding: 6px 10px 8px 10px;
       font-size: 1em;
       font-weight: 600;
+      cursor: pointer;
     }
 
-    .clicked,
-    button:hover {
+    /* button[value="cafes"]::before {
+      content: "#";
+      color: gray;
+    }
+    .clicked[value="cafes"]::before {
+      content: url("logo.png");
+      content: "#";
+      color: purple;
+    }     */
+
+    .clicked {
       background-color: #e3d2fd;
       border: 2px solid #7339D0;
       color: #7339D0;
+    }
+
+    button:hover {
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+
+    .clicked:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     #distance button {
@@ -118,6 +149,25 @@
 
     #category button {
       width: 125px;
+    }
+
+    button#selectAllButton,
+    button#resetButton {
+      margin: 0 0 12px 0;
+      padding: 0;
+      border: 0;
+      font-size: .95em;
+      font-weight: 500;
+      color: #7339D0;
+    }
+
+    #selectAllButton:hover,
+    #resetButton:hover {
+      background-color: white;
+      border: 0;
+      border-radius: 0;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
     }
 
     div.restaurant-list-info {
@@ -152,15 +202,34 @@
       box-shadow: 0 0 7px #ccc;
     }
 
-    .restaurant-card p.categoryStyle {
+    .restaurant-card div.categoryDivStyle {
+      margin: 6px 0 8px 0;
+    }
+
+    .restaurant-card span.categoryStyle {
+      margin: 2px 5px 2px 0;
+      padding: 2px 6px 4px 6px;
+      border: 1px solid #7339D0;
       color: #7339D0;
       font-weight: 600;
+      font-size: .95em;
+      text-transform: lowercase;
+      border-radius: 11px;
     }
 
     .restaurant-card p.snippetStyle {
-      margin: 0 0 0 23px;
-      text-indent: -23px;
+      margin: 5px 0 0 30px;
+      text-indent: 0;
       font-style: italic;
+    }
+
+    .restaurant-card p.snippetStyle::before {
+      content: url('snippet.svg');
+      width: 24px;
+      margin: 0 0 0 -28px;
+      padding: 0;
+      display: inline-block;
+      /* border: 1px solid red; */
     }
 
     .restaurant-name {
@@ -182,9 +251,9 @@
       color: #7339D0
     }
 
-
     div.mapColumn {
       overflow-x: scroll;
+      overflow-y: hidden;
     }
 
     .tick line {
@@ -218,10 +287,10 @@
 
         <!-- RATING FILTER-->
         <h3>RATING</h3>
-        <svg id="histogram" width=300 height=160></svg>
+        <svg id="histogram" width="300" height="115"></svg>
 
         <!-- DISTANCE FILTER-->
-        <h3>DISTANCE</h3>
+        <h3 class="withRule">DISTANCE</h3>
         <div id="distance">
           <button id="mi1_4">.25 mi</button>
           <button id="mi1_2">.5 mi</button>
@@ -229,7 +298,10 @@
         </div>
 
         <!-- CATEGORY FILTER-->
-        <h3>CATEGORY</h3>
+        <h3 class="withRule">CATEGORY</h3>
+        <button id="selectAllButton" value="selectAll">SELECT ALL</button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<button
+          id="resetButton" value="reset">RESET</button>
+
         <div id="category">
           <button id="c01" value="restaurants">restaurants</button>
           <button id="c02" value="cafes">cafes</button>
@@ -243,7 +315,7 @@
           <button id="c10" value="newamerican">american</button>
           <button id="c11" value="chinese">chinese</button>
           <button id="c12" value="french">french</button>
-          <button id="c13" value="inkpak">inkpak</button>
+          <button id="c13" value="indpak">indpak</button>
           <button id="c14" value="italian">italian</button>
           <button id="c15" value="japanese">japanese</button>
           <button id="c16" value="mexican">mexican</button>
@@ -329,12 +401,12 @@
 
       //set up histogram
 
-      const marginHist = ({ top: 20, right: 20, bottom: 40, left: 20 })
-      const widthHist = 300;
-      const heightHist = 150;
+      const marginHist = ({ top: 5, right: 20, bottom: 10, left: 0 })
+      const widthHist = 275;
+      const heightHist = 100;
       let bins = d3.bin().thresholds([3, 3.5, 4, 4.5, 5]).value(d => d.rating)(eateriesAll);
       // console.log("bins", bins);
-      let barPadding = 7;
+      let barPadding = 8;
       let svgHist = d3.select("#histogram");
 
       xScale = d3
@@ -382,33 +454,43 @@
         .style("outline", "solid")
         .style("outline-color", greyedoutColor)
         .attr("fill", "white")
-        .on('mouseover', function (d, i) {
-          if (!i.clicked) {
-            d3.select(this).attr("fill", "#EFE9F8")
-            d3.select(this).style('outline-color', selectedColor);
+        .attr("cursor", "pointer")
+        .on('mouseover', function (event, d) {
+          console.log(event, d)
+          if (!d.clicked) {
+            d3.select(this).attr("fill", "white").style("outline-width", "medium")
+            //d3.select(this).style('outline-color', greyedoutColor);
+          }
+          else {
+            d3.select(this).attr("fill", "#EFE9F8").style("outline-width", "medium")
+            //d3.select(this).style('outline-color', selectedColor);            
           }
         })
-        .on('mouseout', function (d, i) {
-          if (!i.clicked) {
-            d3.select(this).attr("fill", "white")
+        .on('mouseout', function (event, d) {
+          if (!d.clicked) {
+            d3.select(this).attr("fill", "white").style("outline-width", "thin")
             d3.select(this).style('outline-color', greyedoutColor)
             //.attr('style', 'outline: thin solid clear;');
           }
+          else {
+            d3.select(this).attr("fill", "#EFE9F8").style("outline-width", "thin")
+            d3.select(this).style('outline-color', selectedColor);
+          }
         })
-        .on('click', function (d, i) {
-          i.clicked = !i.clicked
+        .on('click', function (event, d) {
+          d.clicked = !d.clicked
 
-          if (i.clicked) {
+          if (d.clicked) {
             d3.select(this).attr("fill", "#EFE9F8")
             d3.select(this).style('outline-color', selectedColor);
 
-            ratinglist.push(i.x0);
+            ratinglist.push(d.x0);
             updateData();
           } else {
             d3.select(this).attr("fill", "white")
             d3.select(this).style('outline-color', greyedoutColor)
 
-            ratinglist = ratinglist.filter(rating => rating != i.x0)
+            ratinglist = ratinglist.filter(rating => rating != d.x0)
             updateData();
           }
         });
@@ -422,43 +504,75 @@
       // CATEGORY FILTER BUTTONS
       // -----------------------
 
-      // user selection results
+      // array for user selection results
       let category_filter = [];
 
       // button labels via id
       let category_labels = ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09',
         'c10', 'c11', 'c12', 'c13', 'c14', 'c15', 'c16', 'c17', 'c18',];
 
+      // SELECTING/DESELECTING CATEGORY BUTTONS ONE AT A TIME
       // loop through category label id's
       category_labels.forEach(categoryLoop);
-
-      // run this code for EACH category id
+      // run for EACH category id
       function categoryLoop(category_id) {
-
         // identify the individual button (ex. restaurants, cafes, etc...)
         let category_button = document.getElementById(category_id);
-
         // Listen for the button click
         category_button.addEventListener('click', () => {
-
-          // toggle highlights for button
-          category_button.classList.toggle('clicked');
-
-          // If the button is clicked...
-          if (category_button.classList.contains('clicked')) {
-
-            // add the button value to our new array
-            category_filter.push(category_button.value);
-            updateData();
-            // Otherwise user unselected the button
-          } else {
-            // remove the button value from the array
-            category_filter = category_filter.filter(item => item != category_button.value);
-            updateData();
+          category_button.classList.toggle('clicked'); // toggle highlights for button
+          if (category_button.classList.contains('clicked')) { // If the button is clicked...
+            category_filter.push(category_button.value); // add the button value to our new array            
+          } else { // Otherwise user unselected the button
+            category_filter = category_filter.filter(item => item != category_button.value); // remove the button value from the array
           }
+
+          updateData();
+          // testing: print new array
+          console.log(category_filter);
         });
       };
 
+      // SELECT ALL BUTTONS (empty the category_filter array first)
+      // Get the SELECT ALL button
+      let selectAllButton = document.getElementById('selectAllButton');
+
+      // Add an event listener to the SELECT ALL button
+      selectAllButton.addEventListener('click', () => {
+        // Empty the category_filter array
+        category_filter = [];
+
+        // Iterate through all category labels and trigger a click event on each button
+        category_labels.forEach(category_id => {
+          let category_button = document.getElementById(category_id);
+          category_button.classList.add('clicked'); // Add the 'clicked' class
+          category_filter.push(category_button.value); // Add the button value to the array
+        });
+        updateData();
+
+        // testing: print new array
+        console.log(category_filter);
+      });
+
+      // RESET BUTTON
+      // Get the RESET button
+      let resetButton = document.getElementById('resetButton');
+
+      // Add an event listener to the RESET button
+      resetButton.addEventListener('click', () => {
+        // Iterate through all category labels and remove the 'clicked' class from each button
+        category_labels.forEach(category_id => {
+          let category_button = document.getElementById(category_id);
+          category_button.classList.remove('clicked'); // Remove the 'clicked' class
+        }
+        );
+
+        // Clear the category_filter array
+        category_filter = [];
+        updateData();
+        // testing: print new array
+        console.log(category_filter);
+      });
 
       // cRestaurant.addEventListener('click', () => {
       //   cRestaurant.classList.toggle('clicked'); 
@@ -948,6 +1062,9 @@
       return div;
     }
 
+    // ---------------
+    // RESTAURANT CARD
+    // ---------------
     function updateRestaurantInfoBox(eateries) {
 
       const restaurantListDiv = d3.select('#restaurantList');
@@ -973,10 +1090,8 @@
           .style('color', 'inherit')
           .style('text-decoration', 'none');
 
-        // Append anchor tags to new restaurant cards
+        // Append individual spans for each search category within a div
         anchorTags.each(function (d) {
-          // For each anchor tag, append details of the restaurant
-
           d3.select(this)
             .append('a')
             .attr('href', d => d.url) // Set href attribute to the restaurant's URL
@@ -990,12 +1105,20 @@
             .node()
             .appendChild(generateStars(d));
 
-          const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
+          const categories = JSON.parse(d.categories_json);
 
-          d3.select(this)
-            .append('p')
-            .attr('class', 'categoryStyle')
-            .text(`Categories: ${d['search category'].join(', ')}`); //use categories if want to see categories_json
+          // Append a div to contain individual spans for each search category
+          const categoryDiv = d3.select(this)
+            .append('div')
+            .attr('class', 'categoryDivStyle');
+
+          // Append individual spans for each search category within the div
+          const categorySpans = categoryDiv.selectAll('.categorySpan') // Assuming you want to use a class for styling
+            .data(categories)
+            .enter()
+            .append('span')
+            .attr('class', 'categoryStyle') // Use appropriate class for styling
+            .text(category => category[0]);
 
           const locationInfo = JSON.parse(d.location_json);
           d3.select(this)
@@ -1005,7 +1128,7 @@
           d3.select(this)
             .append('p')
             .attr('class', 'snippetStyle')
-            .text(d => `💬 "${d.snippet_text}"`);
+            .text(d => `"${d.snippet_text}"`);
         });
 
         // Update existing restaurant cards
@@ -1018,16 +1141,15 @@
 
 
 
-
       /** TODO: TO THINK ABOUT WHEN NEXT PICKUP
-       *  a scroll bar to contain the resturants
-       * the category icons buttons!
+       * [DONE] a scroll bar to contain the resturants
+       * [DONE] the category icons buttons!
        * distance filter? 
        * animation to smoothen transitions
        * maybe switch the two buttons to a single toggle
        * add the rating number next to the stars and the number of reviews in '()' next to the review number
-       *  create an distinction between "best of best" and "all results"
-       * add comment icon for the speech
+       * create an distinction between "best of best" and "all results"
+       * [DONE] add comment icon for the speech
        * */
     }
 
