@@ -1032,7 +1032,7 @@
           d3.select(this)
             .append('p')
             .attr('class', 'categoryStyle')
-            .text(`Categories: ${d['search category'].join(', ')}`); //use categories if want to see categories_json
+            .text(`${d['search category'].join(', ')}`); //use categories if want to see categories_json
 
           const locationInfo = JSON.parse(d.location_json);
           d3.select(this)
