@@ -16,10 +16,10 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
     rel="stylesheet">
-  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
 
   <style>
-
     body {
       font-family: 'Barlow', 'Helvetica', sans-serif;
       font-weight: 400;
@@ -34,10 +34,11 @@
       margin: 20px 0 0 0;
       padding: 0;
       background: linear-gradient(to right, #7339D0, #d81289);
-                -webkit-background-clip: text;
-                background-clip: text;
-                color: transparent;      
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
+
     h2 {
       font-weight: 700;
       font-size: 1em;
@@ -46,6 +47,7 @@
       color: #777;
       border-bottom: 1px solid #777;
     }
+
     h3 {
       font-weight: 700;
       font-size: 1em;
@@ -53,16 +55,19 @@
       padding: 20px 0 15px 0;
       color: #7339D0;
     }
+
     h3#best {
       font-weight: 800;
       font-size: 1.1em;
       color: #d81289;
     }
+
     p {
       margin: 0;
       padding: 3px 0;
       line-height: 1.3em;
     }
+
     p#tagline {
       font-size: 1.1em;
       color: #7339D0;
@@ -83,6 +88,7 @@
       min-width: 275px;
       max-width: 275px;
     }
+
     div.filterButtonContainer {
       height: calc(100vh - 170px);
       overflow-y: scroll;
@@ -93,19 +99,23 @@
       border: 2px solid #777;
       color: #777;
       border-radius: 20px;
-      margin:  0 7px 10px 0;
+      margin: 0 7px 10px 0;
       padding: 8px 10px;
       font-size: 1em;
       font-weight: 600;
     }
-    .clicked, button:hover {
+
+    .clicked,
+    button:hover {
       background-color: #e3d2fd;
       border: 2px solid #7339D0;
       color: #7339D0;
     }
+
     #distance button {
       width: 80px;
     }
+
     #category button {
       width: 125px;
     }
@@ -113,22 +123,26 @@
     div.restaurant-list-info {
       max-width: 400px;
       min-width: 300px;
-      margin: 0; 
+      margin: 0;
       padding: 145px 20px 0 15px;
     }
+
     .restaurant-list {
       height: calc(100vh - 240px);
       margin: 0;
       padding: 5px 20px 10px 10px;
       overflow-y: scroll;
     }
+
     .restaurant-list a {
       text-decoration: none !important;
       color: inherit;
     }
+
     .restaurant-item {
       margin-bottom: 10px;
     }
+
     .restaurant-card {
       border: 1px solid #ccc;
       border-radius: 20px;
@@ -137,15 +151,18 @@
       font-size: medium;
       box-shadow: 0 0 7px #ccc;
     }
+
     .restaurant-card p.categoryStyle {
       color: #7339D0;
       font-weight: 600;
     }
+
     .restaurant-card p.snippetStyle {
       margin: 0 0 0 23px;
       text-indent: -23px;
       font-style: italic;
-    }    
+    }
+
     .restaurant-name {
       font-size: 1.25em;
       font-weight: bold;
@@ -156,9 +173,11 @@
     .fa-star-o {
       color: #7339D0
     }
+
     .fa.checked {
       color: #7339D0
     }
+
     .fa-star-half-full {
       color: #7339D0
     }
@@ -166,6 +185,7 @@
 
     div.mapColumn {
       overflow-x: scroll;
+    }
 
     .tick line {
       visibility: hidden;
@@ -185,78 +205,78 @@
 
 <body>
 
-<div class="flex-container">
+  <div class="flex-container">
 
-  <!-- FILTERS -->
-  <div class="filterColumn">
-    <h1><img src="logo.png" width="35"> Foodie<span style="font-weight:400;">Fix</span></h1>
-    <p id="tagline">Find the best restaurants near me</p>
+    <!-- FILTERS -->
+    <div class="filterColumn">
+      <h1><img src="logo.png" width="35"> Foodie<span style="font-weight:400;">Fix</span></h1>
+      <p id="tagline">Find the best restaurants near me</p>
 
-    <h2>FILTERS</h2>
+      <h2>FILTERS</h2>
 
-    <div class="filterButtonContainer">
+      <div class="filterButtonContainer">
 
-    <!-- RATING FILTER-->
-    <h3>RATING</h3>
-    <svg id="histogram" width=300 height=160></svg>
+        <!-- RATING FILTER-->
+        <h3>RATING</h3>
+        <svg id="histogram" width=300 height=160></svg>
 
-    <!-- DISTANCE FILTER-->
-    <h3>DISTANCE</h3>
-    <div id="distance">
-      <button id="mi0.25"">.25 mi</button>
-      <button id="mi0.5">.5 mi</button>
-      <button id="mi1">1 mi</button>
+        <!-- DISTANCE FILTER-->
+        <h3>DISTANCE</h3>
+        <div id="distance">
+          <button id="mi1_4">.25 mi</button>
+          <button id="mi1_2">.5 mi</button>
+          <button id="mi1">1 mi</button>
+        </div>
+
+        <!-- CATEGORY FILTER-->
+        <h3>CATEGORY</h3>
+        <div id="category">
+          <button id="c01" value="restaurants">restaurants</button>
+          <button id="c02" value="cafes">cafes</button>
+          <button id="c03" value="coffee">coffee</button>
+          <button id="c04" value="sandwiches">sandwiches</button>
+          <button id="c05" value="sushi">sushi</button>
+          <button id="c06" value="pizza">pizza</button>
+          <button id="c07" value="donuts">donuts</button>
+          <button id="c08" value="bakeries">bakeries</button>
+          <button id="c09" value="ethnicmarkets">ethnic</button>
+          <button id="c10" value="newamerican">american</button>
+          <button id="c11" value="chinese">chinese</button>
+          <button id="c12" value="french">french</button>
+          <button id="c13" value="inkpak">inkpak</button>
+          <button id="c14" value="italian">italian</button>
+          <button id="c15" value="japanese">japanese</button>
+          <button id="c16" value="mexican">mexican</button>
+          <button id="c17" value="thai">thai</button>
+          <button id="c18" value="vietnamese">vietnamese</button>
+        </div>
+
+      </div>
     </div>
 
-    <!-- CATEGORY FILTER-->
-    <h3>CATEGORY</h3>
-    <div id="category">
-        <button id="c01" value="restaurants">restaurants</button>
-        <button id="c02" value="cafes">cafes</button>
-        <button id="c03" value="coffee">coffee</button>
-        <button id="c04" value="sandwiches">sandwiches</button>
-        <button id="c05" value="sushi">sushi</button>
-        <button id="c06" value="pizza">pizza</button>
-        <button id="c07" value="donuts">donuts</button>
-        <button id="c08" value="bakeries">bakeries</button>
-        <button id="c09" value="ethnicmarkets">ethnic</button>
-        <button id="c10" value="newamerican">american</button>
-        <button id="c11" value="chinese">chinese</button>
-        <button id="c12" value="french">french</button>        
-        <button id="c13" value="inkpak">inkpak</button>        
-        <button id="c14" value="italian">italian</button>        
-        <button id="c15" value="japanese">japanese</button>        
-        <button id="c16" value="mexican">mexican</button>        
-        <button id="c17" value="thai">thai</button>        
-        <button id="c18" value="vietnamese">vietnamese</button>        
-    </div>
-
-    </div>
-  </div>
-
-  <!-- LIST -->
-  <div id="restaurantInfoBox" class="restaurant-list-info">
+    <!-- LIST -->
+    <div id="restaurantInfoBox" class="restaurant-list-info">
       <h2>RESTAURANTS NEAR ME</h2>
       <h3 id="best">FoodieFix Picks</h3>
       <div id="restaurantList" class="restaurant-list"></div>
+    </div>
+
+    <!-- MAP -->
+    <div class="mapColumn">
+      <svg id="svgMap" width="650" height="1100">
+        <defs>
+          <clipPath id="circleClip">
+            <circle cx="250" cy="250" r="200" />
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+
   </div>
 
-  <!-- MAP -->
-  <div class="mapColumn" >
-    <svg id="svgMap" width="650" height="1100">
-      <defs>
-        <clipPath id="circleClip">
-          <circle cx="250" cy="250" r="200" />
-        </clipPath>
-      </defs>
-    </svg>
-  </div>
-
-</div>
 
 
-
-<!-- ==================
+  <!-- ==================
         MAP SCRIPT
     =================== -->
   <script id="map">
@@ -406,31 +426,31 @@
       let category_filter = [];
 
       // button labels via id
-      let category_labels = ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09', 
-                            'c10', 'c11', 'c12', 'c13', 'c14', 'c15', 'c16', 'c17', 'c18', ];
+      let category_labels = ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09',
+        'c10', 'c11', 'c12', 'c13', 'c14', 'c15', 'c16', 'c17', 'c18',];
 
       // loop through category label id's
       category_labels.forEach(categoryLoop);
 
       // run this code for EACH category id
       function categoryLoop(category_id) {
-        
+
         // identify the individual button (ex. restaurants, cafes, etc...)
         let category_button = document.getElementById(category_id);
 
         // Listen for the button click
         category_button.addEventListener('click', () => {
-        
-          // toggle highlights for button
-          category_button.classList.toggle('clicked'); 
 
-        // If the button is clicked...
-          if(category_button.classList.contains('clicked')){
-      
+          // toggle highlights for button
+          category_button.classList.toggle('clicked');
+
+          // If the button is clicked...
+          if (category_button.classList.contains('clicked')) {
+
             // add the button value to our new array
             category_filter.push(category_button.value);
-          
-          // Otherwise user unselected the button
+
+            // Otherwise user unselected the button
           } else {
             // remove the button value from the array
             category_filter = category_filter.filter(item => item != category_button.value);
@@ -450,10 +470,10 @@
       //   if(cRestaurant_toggle){
       //     // add element
       //     category_filter.push('restaurants');
-          
+
       //     // show proof
       //     console.log(category_filter);
-        
+
       //     // User un-selected restaurants
       //   } else {
       //     // remove element
@@ -463,15 +483,15 @@
       //     console.log(category_filter);
       //   }
       // });
-   
+
 
 
       // -----------------------
       // DISTANCE FILTER BUTTONS
       // -----------------------
       const mi1 = document.getElementById('mi1');
-      const mi1_2 = document.getElementById('mi0.5');
-      const mi1_4 = document.getElementById('mi0.25');
+      const mi1_2 = document.getElementById('mi1_2');
+      const mi1_4 = document.getElementById('mi1_4');
 
       let mi1_toggle = false;
       let mi1_2_toggle = false;
@@ -487,6 +507,7 @@
 
         update_dist();
       });
+
       mi1_2.addEventListener('click', () => {
         mi1_2.classList.toggle('clicked');
         mi1_toggle = false;
