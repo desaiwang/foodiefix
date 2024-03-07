@@ -2,9 +2,6 @@
 
 <head>
   <title>INFO 4310 - HW3</title>
-  <!-- TODO-C: temp styles from old assignment, feel free to update -->
-  <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
   <!-- <link href="./style.css" rel="stylesheet" type="text/css"> -->
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -25,7 +22,9 @@
       font-weight: 400;
       margin: 0 0 0 50px;
       padding: 0;
-      overflow: hidden;
+      min-width: 1400px;
+      overflow-x: scroll;
+      overflow-y: hidden;
     }
 
     h1 {
@@ -95,12 +94,13 @@
     }
 
     button {
+      font-family: 'Barlow', 'Helvetica', sans-serif;
       background-color: #ffffff;
       border: 2px solid #777;
       color: #777;
       border-radius: 20px;
       margin: 0 7px 10px 0;
-      padding: 8px 10px;
+      padding: 6px 10px 8px 10px;
       font-size: 1em;
       font-weight: 600;
     }
@@ -119,6 +119,27 @@
     #category button {
       width: 125px;
     }
+
+    button#selectAllButton, button#resetButton  {
+      margin: 0 0 12px 0;
+      padding: 0;
+      border-top: 0;
+      border-right: 0;
+      border-left: 0;
+      border-bottom: 1px solid white;      
+      font-size: 1em;
+      font-weight: 500;
+      color: #7339D0;
+    }
+
+    #selectAllButton:hover, #resetButton:hover  {
+      background-color: white;
+      border-top: 0;
+      border-right: 0;
+      border-left: 0;
+      border-bottom: 1px solid;
+      border-radius: 0;
+    }    
 
     div.restaurant-list-info {
       max-width: 400px;
@@ -158,7 +179,7 @@
     }
 
     .restaurant-card p.snippetStyle {
-      margin: 0 0 0 23px;
+      margin: 5px 0 0 23px;
       text-indent: -23px;
       font-style: italic;
     }
@@ -185,6 +206,7 @@
 
     div.mapColumn {
       overflow-x: scroll;
+      overflow-y: hidden;
     }
 
     .tick line {
@@ -218,7 +240,7 @@
 
         <!-- RATING FILTER-->
         <h3>RATING</h3>
-        <svg id="histogram" width=300 height=160></svg>
+        <svg id="histogram" width=300 height=125></svg>
 
         <!-- DISTANCE FILTER-->
         <h3>DISTANCE</h3>
@@ -230,6 +252,8 @@
 
         <!-- CATEGORY FILTER-->
         <h3>CATEGORY</h3>
+        <button id="selectAllButton" value="selectAll">SELECT ALL</button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<button id="resetButton" value="reset">RESET</button>
+
         <div id="category">
           <button id="c01" value="restaurants">restaurants</button>
           <button id="c02" value="cafes">cafes</button>
@@ -329,12 +353,12 @@
 
       //set up histogram
 
-      const marginHist = ({ top: 20, right: 20, bottom: 40, left: 20 })
-      const widthHist = 300;
-      const heightHist = 150;
+      const marginHist = ({ top: 5, right: 20, bottom: 10, left: 0 })
+      const widthHist = 275;
+      const heightHist = 110;
       let bins = d3.bin().thresholds([3, 3.5, 4, 4.5, 5]).value(d => d.rating)(eateriesAll);
       // console.log("bins", bins);
-      let barPadding = 7;
+      let barPadding = 8;
       let svgHist = d3.select("#histogram");
 
       xScale = d3
@@ -422,38 +446,27 @@
       // CATEGORY FILTER BUTTONS
       // -----------------------
 
-      // user selection results
+      // array for user selection results
       let category_filter = [];
 
       // button labels via id
       let category_labels = ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09',
         'c10', 'c11', 'c12', 'c13', 'c14', 'c15', 'c16', 'c17', 'c18',];
-
+      
+      // SELECTING/DESELECTING CATEGORY BUTTONS ONE AT A TIME
       // loop through category label id's
       category_labels.forEach(categoryLoop);
-
-      // run this code for EACH category id
+      // run for EACH category id
       function categoryLoop(category_id) {
-
         // identify the individual button (ex. restaurants, cafes, etc...)
         let category_button = document.getElementById(category_id);
-
         // Listen for the button click
-        category_button.addEventListener('click', () => {
-
-          // toggle highlights for button
-          category_button.classList.toggle('clicked');
-
-          // If the button is clicked...
-          if (category_button.classList.contains('clicked')) {
-
-            // add the button value to our new array
-            category_filter.push(category_button.value);
-
-            // Otherwise user unselected the button
-          } else {
-            // remove the button value from the array
-            category_filter = category_filter.filter(item => item != category_button.value);
+        category_button.addEventListener('click', () => {          
+          category_button.classList.toggle('clicked'); // toggle highlights for button
+          if (category_button.classList.contains('clicked')) { // If the button is clicked...
+            category_filter.push(category_button.value); // add the button value to our new array            
+          } else { // Otherwise user unselected the button
+            category_filter = category_filter.filter(item => item != category_button.value); // remove the button value from the array
           }
 
           // testing: print new array
@@ -461,6 +474,44 @@
         });
       };
 
+      // SELECT ALL BUTTONS (empty the category_filter array first)
+      // Get the SELECT ALL button
+      let selectAllButton = document.getElementById('selectAllButton');
+
+      // Add an event listener to the SELECT ALL button
+      selectAllButton.addEventListener('click', () => {
+        // Empty the category_filter array
+        category_filter = [];
+
+        // Iterate through all category labels and trigger a click event on each button
+        category_labels.forEach(category_id => {
+          let category_button = document.getElementById(category_id);
+          category_button.classList.add('clicked'); // Add the 'clicked' class
+          category_filter.push(category_button.value); // Add the button value to the array
+        });
+
+        // testing: print new array
+        console.log(category_filter);
+      });
+
+      // RESET BUTTON
+      // Get the RESET button
+      let resetButton = document.getElementById('resetButton');
+
+      // Add an event listener to the RESET button
+      resetButton.addEventListener('click', () => {
+        // Iterate through all category labels and remove the 'clicked' class from each button
+        category_labels.forEach(category_id => {
+          let category_button = document.getElementById(category_id);
+          category_button.classList.remove('clicked'); // Remove the 'clicked' class
+        });
+
+        // Clear the category_filter array
+        category_filter = [];
+
+        // testing: print new array
+        console.log(category_filter);
+      });
 
       // cRestaurant.addEventListener('click', () => {
       //   cRestaurant.classList.toggle('clicked'); 
