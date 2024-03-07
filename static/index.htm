@@ -221,7 +221,7 @@
 
       let ratinglist = [];
 
-      svgHist
+      let histBars = svgHist
         .append("g")
         .selectAll("rect")
         .data(bins)
@@ -263,8 +263,6 @@
             ratinglist = ratinglist.filter(rating => rating != i.x0)
             updateData();
           }
-
-
 
         });
 
@@ -399,6 +397,8 @@
         .attr("x", 10)
         .attr("y", 25);
 
+      // let test = tooltip.append("g").attr("id", "stars");
+
       let svgEateries = svgMap.append("g");
 
       //circles that represent eateries
@@ -410,21 +410,22 @@
         .attr("fill", selectedColor)
         .attr("opacity", 0.9)
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
-        .on("mouseover", (event) => {
+        .on("mouseover", (d, i) => {
           tooltip.style("visibility", "visible");
 
 
-          let eatery = event.target.__data__
+          let eatery = i
+          console.log(i);
 
           //dynamically adjusts width, delete later
           tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 100) { tooltipWidth = 120; }
+          if (tooltipWidth < 200) { tooltipWidth = 120; }
 
 
           box.attr("width", tooltipWidth)
 
           txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']})`)
+          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
 
           tooltip
             .raise();
@@ -568,34 +569,45 @@
           })
           .attr("opacity", 0.9)
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
-          .on("mouseover", (event) => {
+          .on("mouseover", (e, d) => {
             tooltip.style("visibility", "visible");
 
-
-            let eatery = event.target.__data__
-
             //dynamically adjusts width, delete later
-            tooltipWidth = eatery['name'].length * 10
-            if (tooltipWidth < 100) { tooltipWidth = 120; }
+            tooltipWidth = d['name'].length * 10
+            if (tooltipWidth < 200) { tooltipWidth = 200; }
 
 
             box.attr("width", tooltipWidth)
 
-            txt.text(eatery['name']);
-            txt2.text(`Rating: ${eatery['rating']}, ${eatery['review_count']}`)
+            txt.text(d['name']);
+            txt2.text(`Rating: ${d['rating']} (${d['review_count']} reviews)`)
+
+
 
             tooltip
               .raise();
+            // test.node().appendChild(generateStars(d)).raise();
 
           })
           .on("mouseout", (event) => {
+            // test.selectAll("*").remove()
             tooltip.style("visibility", "hidden");
           });
 
 
       }
 
-      updateData();
+      //dispatch some simulated click events so histograms are clicked upon web launch
+      histBars.each(function () {
+        let e = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        this.dispatchEvent(e);
+      })
+
+      mi1.click();
 
     }
 
