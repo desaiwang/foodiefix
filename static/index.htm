@@ -239,7 +239,6 @@
 
       updateRestaurantInfoBox(eateriesInRadius);
 
-
       // -----------------------
       // CATEGORY FILTER BUTTONS
       // -----------------------
@@ -477,28 +476,63 @@
         .on("mouseout", (event) => {
           tooltip.style("visibility", "hidden");
         });
+      
 
-      let myLocation = svgMap.selectAll("circle.me").data([myCoordinates])
-        .join("circle")
+      // //add location marker here:
+      // let myLocation = svgMap.selectAll("circle.me").data([myCoordinates])
+      //   .join("circle")
+      //   .attr("class", "me")
+      //   .attr("r", 3)
+      //   .attr("fill", "yellow")
+      //   .attr("opacity", 1)
+      //   .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
+      //   .call(d3.drag()
+      //     // .on("start", (event, d) => console.log("drag start"))
+      //     .on("drag", (event, d) => {
+      //       // console.log("dragging");
+
+      //       newCoords = projection.invert([event.x, event.y]);
+      //       d.longitude = newCoords[0];
+      //       d.latitude = newCoords[1];
+      //       [myCoordinates.longitude, myCoordinates.latitude] = newCoords;
+      //       updateMyLocation();
+
+      //     })
+      //     // .on("end", (event, d) => console.log("drag end"))
+      //     .on("start.update drag.update end.update", console.log("update")));
+
+      let myLocation = svgMap.selectAll("g.me")
+        .data([myCoordinates])
+        .join("g")
         .attr("class", "me")
-        .attr("r", 3)
-        .attr("fill", "yellow")
-        .attr("opacity", 1)
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
         .call(d3.drag()
-          // .on("start", (event, d) => console.log("drag start"))
+          .on("start", (event, d) => console.log("drag start"))
           .on("drag", (event, d) => {
-            // console.log("dragging");
-
-            newCoords = projection.invert([event.x, event.y]);
+            console.log("dragging")
+            const newCoords = projection.invert([event.x, event.y]);
             d.longitude = newCoords[0];
             d.latitude = newCoords[1];
             [myCoordinates.longitude, myCoordinates.latitude] = newCoords;
             updateMyLocation();
-
           })
-          // .on("end", (event, d) => console.log("drag end"))
+          .on("end", (event, d) => console.log("drag end"))
           .on("start.update drag.update end.update", console.log("update")));
+
+      // myLocation.append("circle")
+      //   .attr("r", 3)
+      //   .attr("fill", "yellow")
+      //   .attr("opacity", 1);
+
+      myLocation.append("image")
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr("xlink:href", 'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png');
+
+
+
+
+
 
       //updates myLocation, radiusBuffer, and eatery color
 
