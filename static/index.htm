@@ -49,7 +49,7 @@
 
     h3 {
       font-weight: 700;
-      font-size: 1em;
+      font-size: 1.05em;
       margin: 0;
       padding: 20px 0 15px 0;
       color: #7339D0;
@@ -63,7 +63,7 @@
 
     h3#best {
       font-weight: 800;
-      font-size: 1.1em;
+      font-size: 1.15em;
       color: #d81289;
     }
 
@@ -179,9 +179,18 @@
       box-shadow: 0 0 7px #ccc;
     }
 
-    .restaurant-card p.categoryStyle {
+    .restaurant-card div.categoryDivStyle {
+      margin: 6px 0 3px 0;
+    }
+    .restaurant-card span.categoryStyle {
+      margin: 2px 5px 2px 0;
+      padding: 2px 6px;
+      border: 1px solid #7339D0;
       color: #7339D0;
       font-weight: 600;
+      font-size: .95em;
+      text-transform:lowercase;
+      border-radius: 11px;
     }
 
     .restaurant-card p.snippetStyle {
@@ -246,7 +255,7 @@
 
         <!-- RATING FILTER-->
         <h3>RATING</h3>
-        <svg id="histogram" width=300 height=125></svg>
+        <svg id="histogram" width="300" height="115"></svg>
 
         <!-- DISTANCE FILTER-->
         <h3 class="withRule">DISTANCE</h3>
@@ -361,7 +370,7 @@
 
       const marginHist = ({ top: 5, right: 20, bottom: 10, left: 0 })
       const widthHist = 275;
-      const heightHist = 110;
+      const heightHist = 100;
       let bins = d3.bin().thresholds([3, 3.5, 4, 4.5, 5]).value(d => d.rating)(eateriesAll);
       // console.log("bins", bins);
       let barPadding = 8;
@@ -414,7 +423,7 @@
         .attr("fill", "white")
         .on('mouseover', function (d, i) {
           if (!i.clicked) {
-            d3.select(this).attr("fill", "#EFE9F8")
+            d3.select(this).attr("fill", "#EFE9F8") 
             d3.select(this).style('outline-color', selectedColor);
           }
         })
@@ -991,86 +1000,94 @@
       return div;
     }
 
-    function updateRestaurantInfoBox(eateries) {
+    // ---------------
+    // RESTAURANT CARD
+    // ---------------
+  function updateRestaurantInfoBox(eateries) {
 
-      const restaurantListDiv = d3.select('#restaurantList');
-      restaurantListDiv.selectAll("*").remove();
+  const restaurantListDiv = d3.select('#restaurantList');
+  restaurantListDiv.selectAll("*").remove();
 
-      if (eateries.length == 0) {
-        restaurantListDiv
-          .append('div')
-          .attr('class', 'restaurant-card')
-          .append('p')
-          .text("Nothing meets your criteria. Try increasing distance.")
-      } else {
-        // Bind data to restaurant cards
-        const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
-          .data(eateries.slice(0, 5)); // Limit to first 5 restaurants
+  if (eateries.length == 0) {
+    restaurantListDiv
+      .append('div')
+      .attr('class', 'restaurant-card')
+      .append('p')
+      .text("Nothing meets your criteria. Try increasing distance.")
+  } else {
+    // Bind data to restaurant cards
+    const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
+      .data(eateries.slice(0, 5)); // Limit to first 5 restaurants
 
-        // Enter selection - create new elements for restaurants
-        const newRestaurantCards = restaurantCards.enter()
-          .append('div')
-          .attr('class', 'restaurant-card');
+    // Enter selection - create new elements for restaurants
+    const newRestaurantCards = restaurantCards.enter()
+      .append('div')
+      .attr('class', 'restaurant-card');
 
-        const anchorTags = newRestaurantCards
-          .style('color', 'inherit')
-          .style('text-decoration', 'none');
+    const anchorTags = newRestaurantCards
+      .style('color', 'inherit')
+      .style('text-decoration', 'none');
 
-        // Append anchor tags to new restaurant cards
-        anchorTags.each(function (d) {
-          // For each anchor tag, append details of the restaurant
+  // Append individual spans for each search category within a div
+  anchorTags.each(function (d) {
+    d3.select(this)
+      .append('a')
+      .attr('href', d => d.url) // Set href attribute to the restaurant's URL
+      .attr('target', '_blank') // Open link in a new tab
+      .append('p')
+      .attr('class', 'restaurant-name')
+      .text(d => d.name);
 
-          d3.select(this)
-            .append('a')
-            .attr('href', d => d.url) // Set href attribute to the restaurant's URL
-            .attr('target', '_blank') // Open link in a new tab
-            .append('p')
-            .attr('class', 'restaurant-name')
-            .text(d => d.name);
+    d3.select(this)
+      .append('div')
+      .node()
+      .appendChild(generateStars(d));
 
-          d3.select(this)
-            .append('div')
-            .node()
-            .appendChild(generateStars(d));
+    const categories = JSON.parse(d.categories_json);
 
-          const categories = JSON.parse(d.categories_json).map(category => category[0]).join(', ');
+    // Append a div to contain individual spans for each search category
+    const categoryDiv = d3.select(this)
+      .append('div')
+      .attr('class', 'categoryDivStyle');
 
-          d3.select(this)
-            .append('p')
-            .attr('class', 'categoryStyle')
-            .text(`${d['search category'].join(', ')}`); //use categories if want to see categories_json
+    // Append individual spans for each search category within the div
+    const categorySpans = categoryDiv.selectAll('.categorySpan') // Assuming you want to use a class for styling
+      .data(categories)
+      .enter()
+      .append('span')
+      .attr('class', 'categoryStyle') // Use appropriate class for styling
+      .text(category => category[0]);
 
-          const locationInfo = JSON.parse(d.location_json);
-          d3.select(this)
-            .append('p')
-            .text(`${locationInfo.display_address.join(', ')}`);
+    const locationInfo = JSON.parse(d.location_json);
+    d3.select(this)
+      .append('p')
+      .text(`${locationInfo.display_address.join(', ')}`);
 
-          d3.select(this)
-            .append('p')
-            .attr('class', 'snippetStyle')
-            .text(d => `💬 "${d.snippet_text}"`);
-        });
+    d3.select(this)
+      .append('p')
+      .attr('class', 'snippetStyle')
+      .text(d => `💬 "${d.snippet_text}"`);
+  });
 
-        // Update existing restaurant cards
-        restaurantCards.select('a')
-          .attr('href', d => d.url);
+    // Update existing restaurant cards
+    restaurantCards.select('a')
+      .attr('href', d => d.url);
 
-        // Remove excess restaurant cards
-        restaurantCards.exit().remove();
-      }
-
+    // Remove excess restaurant cards
+    restaurantCards.exit().remove();
+    }
 
 
 
       /** TODO: TO THINK ABOUT WHEN NEXT PICKUP
-       *  a scroll bar to contain the resturants
-       * the category icons buttons!
+       * [DONE] a scroll bar to contain the resturants
+       * [DONE] the category icons buttons!
        * distance filter? 
        * animation to smoothen transitions
        * maybe switch the two buttons to a single toggle
        * add the rating number next to the stars and the number of reviews in '()' next to the review number
-       *  create an distinction between "best of best" and "all results"
-       * add comment icon for the speech
+       * create an distinction between "best of best" and "all results"
+       * [DONE] add comment icon for the speech
        * */
     }
 
