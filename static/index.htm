@@ -452,6 +452,7 @@
         .attr("height", d => yScale(0) - yScale(d.length))
         .style("border-radius", "1px")
         .style("outline", "solid")
+        .style("outline-width", "thin")
         .style("outline-color", greyedoutColor)
         .attr("fill", "white")
         .attr("cursor", "pointer")
@@ -820,8 +821,8 @@
         .call(zoom)
         .call(zoom.transform, d3.zoomIdentity
           .translate(width / 2, height / 2)
-          .scale(- 1 << 19)
-          .translate(...projection([-71.073, 42.348]))
+          .scale(- 1 << 22)
+          .translate(...projection([myCoordinates.longitude, myCoordinates.latitude]))
           .scale(-1)
         )
         .on("mousewheel.zoom", null)
@@ -956,8 +957,10 @@
         });
         this.dispatchEvent(e);
       })
-      //same with mile1 button
+
+      //same with mile1 button and all categories
       mi1.click();
+      selectAllButton.click();
 
     }
 
@@ -1075,7 +1078,7 @@
           .append('div')
           .attr('class', 'restaurant-card')
           .append('p')
-          .text("Nothing meets your criteria. Try increasing distance.")
+          .text("Nothing meets your criteria. Try increasing distance or changing filtered categories.")
       } else {
         // Bind data to restaurant cards
         const restaurantCards = restaurantListDiv.selectAll('.restaurant-card')
