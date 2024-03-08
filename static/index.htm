@@ -726,74 +726,7 @@
       // let test = tooltip.append("g").attr("id", "stars");
 
       let svgEateries = svgMap.append("g");
-
-      //circles that represent eateries
-
-      let circles = svgEateries.selectAll("circle.eateries").data(eateries)
-        .join("circle")
-        .attr("class", "eateries")
-        .attr("r", 3)
-        .attr("fill", selectedColor)
-        .attr("opacity", 0.9)
-        .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
-        .on("mouseover", (d, i) => {
-          tooltip.style("visibility", "visible");
-
-          let eatery = i
-
-          //dynamically adjusts width, delete later
-          tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 200) { tooltipWidth = 200; }
-
-          box.attr("width", tooltipWidth)
-          txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
-
-          tooltip
-            .raise();
-
-        })
-        .on("mouseout", (event) => {
-          tooltip.style("visibility", "hidden");
-        });
-
-
-      //update best 3 markers
-      let foodiePicks = eateries.slice(0, 5);
-      let svgFoodiePicks = svgMap.append("g").attr("id", "foodie picks");
-
-      let stars = svgFoodiePicks.selectAll("image")
-        .data(foodiePicks)
-        .join("image")
-        .attr("class", "star-marker")
-        .attr("xlink:href", "./star.png")
-        .attr("x", -10)
-        .attr("y", -10)
-        .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
-        .attr("width", 20) // Adjust the width as needed
-        .attr("height", 20) // Adjust the height as needed
-        .on("mouseover", (d, i) => {
-          tooltip.style("visibility", "visible");
-
-          let eatery = i
-
-          //dynamically adjusts width, delete later
-          tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 200) { tooltipWidth = 200; }
-
-          box.attr("width", tooltipWidth)
-          txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
-
-          tooltip
-            .raise();
-
-        })
-        .on("mouseout", (event) => {
-          tooltip.style("visibility", "hidden");
-        });
-
-
+      let svgFoodiePicks = svgMap.append("g");
 
       let myLocation = svgMap.selectAll("g.me").data([myCoordinates])
         .join("g")
@@ -843,7 +776,7 @@
 
       }
       var zoom = d3.zoom()
-        .scaleExtent([1 << 18.5, 1 << 25])
+        .scaleExtent([1 << 18.5, 1 << 26])
         .on("zoom", ({ transform }) => zoomed(transform));
 
       svgMap
@@ -879,9 +812,6 @@
         projection
           .scale(transform.k / (2 * Math.PI))
           .translate([transform.x, transform.y]);
-
-        circles
-          .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
 
         updateMyLocation();
       };
@@ -925,16 +855,21 @@
 
 
         // Draw the circles
-        circles = svgEateries.selectAll("circle.eateries").data(eateries)
+        svgEateries.selectAll("circle.eateries").data(eateries)
           .join("circle")
           .attr("class", "eateries")
-          .attr("r", 3)
           .attr("fill", (d) => {
             d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
-            if (d.dist < filter_dist) {
+            d.inside = d.dist < filter_dist
+            if (d.inside) {
               return selectedColor
             }
             else { return greyedoutColor }
+          })
+          .attr("r", 5)
+          .style("stroke", "white")
+          .attr("stroke-width", (d) => {
+            if (d.inside) { return "2px" }
           })
           .attr("opacity", 0.9)
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
@@ -971,12 +906,11 @@
 
 
         //updating stars on map
-        foodiePicks = eateriesInRadius.slice(0, 5);
-        stars = svgFoodiePicks.selectAll("image")
-          .data(foodiePicks)
+        svgFoodiePicks.selectAll("image")
+          .data(eateriesInRadius.slice(0, 5)) //top 5 entires
           .join("image")
           .attr("class", "star-marker")
-          .attr("xlink:href", "./star.png")
+          .attr("xlink:href", "./star_pink.png")
           .attr("x", -10)
           .attr("y", -10)
           .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
@@ -1018,6 +952,7 @@
       //same with mile1 button and all categories
       mi1.click();
       selectAllButton.click();
+      updateData();
 
     }
 
