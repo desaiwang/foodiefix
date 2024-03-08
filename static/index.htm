@@ -771,12 +771,17 @@
           tooltip.style("visibility", "hidden");
         });
 
-      let myLocation = svgMap.selectAll("circle.me").data([myCoordinates])
-        .join("circle")
-        .attr("class", "me")
-        .attr("r", 3)
-        .attr("fill", "yellow")
-        .attr("opacity", 1)
+
+      let myLocation = svgMap.selectAll("g.me").data([myCoordinates])
+        .join("g")
+        .append("image")
+        .attr('width', 25)
+        .attr('height', 25)
+        .attr("xlink:href", './my_location_filled.png')
+        .attr("fill", "red")
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("x", -12.5)  // Adjust x position to center the image
+        .attr("y", -12.5)// Adjust y position to center the image
         .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
         .call(d3.drag()
           // .on("start", (event, d) => console.log("drag start"))
