@@ -409,17 +409,17 @@
       let barPadding = 8;
       let svgHist = d3.select("#histogram");
 
-      xScale = d3
+      let xScale = d3
         .scaleLinear()
         .domain([bins[0].x0, bins[bins.length - 1].x1 + 0.5])
         .range([marginHist.left, widthHist - marginHist.right])
 
-      x = d3.scaleBand()
+      let x = d3.scaleBand()
         .domain([3.5, 4.0, 4.5, 5.0])
         .range([marginHist.left - barPadding * 1.5, widthHist - marginHist.right + barPadding * 2])
         .padding(0.3) //TODO: maybe set this instead of multiplying in Padding
 
-      yScale = d3
+      let yScale = d3
         .scaleSymlog()
         .domain([0, d3.max(bins, d => d.length)])
         .nice()
@@ -436,10 +436,9 @@
           )
       };
 
-      let ratinglist = [];
+      let ratinglist = []; //used to update ratings
 
       let histBars = svgHist
-        .append("g")
         .selectAll("rect")
         .data(bins)
         .join("rect")
@@ -936,6 +935,19 @@
           .on("mouseout", (event) => {
             tooltip.style("visibility", "hidden");
           });
+
+
+        histBars
+          .attr("height", (d) => {
+            if (d.clicked) {
+              passedfilter = (d.filter(data => pointPassesFilters(data)));
+              d.filteredlength = yScale(passedfilter.length);
+            } else {
+              d.filteredlength = yScale(d.length);
+            }
+            return yScale(0) - d.filteredlength
+          })
+          .attr("y", d => d.filteredlength);
 
       }
 
