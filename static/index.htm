@@ -436,9 +436,6 @@
           )
       };
 
-      // console.log(bins);
-      // console.log(bins.length)
-
       let ratinglist = [];
 
       let histBars = svgHist
@@ -458,7 +455,7 @@
         .attr("fill", "white")
         .attr("cursor", "pointer")
         .on('mouseover', function (event, d) {
-          console.log(event, d)
+          // console.log(event, d)
           if (!d.clicked) {
             d3.select(this).attr("fill", "white").style("outline-width", "medium")
             //d3.select(this).style('outline-color', greyedoutColor);
@@ -530,8 +527,6 @@
           }
 
           updateData();
-          // testing: print new array
-          console.log(category_filter);
         });
       };
 
@@ -552,8 +547,6 @@
         });
         updateData();
 
-        // testing: print new array
-        console.log(category_filter);
       });
 
       // RESET BUTTON
@@ -569,11 +562,8 @@
         }
         );
 
-        // Clear the category_filter array
         category_filter = [];
         updateData();
-        // testing: print new array
-        console.log(category_filter);
       });
 
       // cRestaurant.addEventListener('click', () => {
@@ -749,17 +739,13 @@
         .on("mouseover", (d, i) => {
           tooltip.style("visibility", "visible");
 
-
           let eatery = i
-          console.log(i);
 
           //dynamically adjusts width, delete later
           tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 200) { tooltipWidth = 120; }
-
+          if (tooltipWidth < 200) { tooltipWidth = 200; }
 
           box.attr("width", tooltipWidth)
-
           txt.text(eatery['name']);
           txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
 
@@ -770,6 +756,43 @@
         .on("mouseout", (event) => {
           tooltip.style("visibility", "hidden");
         });
+
+
+      //update best 3 markers
+      let foodiePicks = eateries.slice(0, 5);
+      let svgFoodiePicks = svgMap.append("g").attr("id", "foodie picks");
+
+      let stars = svgFoodiePicks.selectAll("image")
+        .data(foodiePicks)
+        .join("image")
+        .attr("class", "star-marker")
+        .attr("xlink:href", "./star.png")
+        .attr("x", -10)
+        .attr("y", -10)
+        .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
+        .attr("width", 20) // Adjust the width as needed
+        .attr("height", 20) // Adjust the height as needed
+        .on("mouseover", (d, i) => {
+          tooltip.style("visibility", "visible");
+
+          let eatery = i
+
+          //dynamically adjusts width, delete later
+          tooltipWidth = eatery['name'].length * 10
+          if (tooltipWidth < 200) { tooltipWidth = 200; }
+
+          box.attr("width", tooltipWidth)
+          txt.text(eatery['name']);
+          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
+
+          tooltip
+            .raise();
+
+        })
+        .on("mouseout", (event) => {
+          tooltip.style("visibility", "hidden");
+        });
+
 
 
       let myLocation = svgMap.selectAll("g.me").data([myCoordinates])
@@ -786,7 +809,6 @@
         .call(d3.drag()
           // .on("start", (event, d) => console.log("drag start"))
           .on("drag", (event, d) => {
-            // console.log("dragging");
 
             newCoords = projection.invert([event.x, event.y]);
             d.longitude = newCoords[0];
@@ -796,7 +818,8 @@
 
           })
           // .on("end", (event, d) => console.log("drag end"))
-          .on("start.update drag.update end.update", console.log("update")));
+          // .on("start.update drag.update end.update", console.log("update"))
+        );
 
       //updates myLocation, radiusBuffer, and eatery color
 
@@ -896,16 +919,9 @@
 
         filters['search category'] = filterCategory;
 
-        // testing: print new array
-        console.log("filtering inside updateData()", category_filter);
-
         // Filter the points using the filter dictionary first
         eateries = eateriesAll.filter(d => pointPassesFilters(d));
-
-        console.log('filtered eateries', eateries);
-        // console.log(eateries[0]["longitude"], eateries[0]["latitude"]);
-        // console.log(projection([eateries[0]["longitude"], eateries[0]["latitude"]]));
-        // console.log(projection([-71.05686665, 42.35140831]));
+        // console.log('filtered eateries', eateries);
 
 
         // Draw the circles
@@ -948,9 +964,44 @@
           });
 
 
+
         eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
-        console.log("updating eateriesInRadius", eateriesInRadius);
+        // console.log("updating eateriesInRadius", eateriesInRadius);
         updateRestaurantInfoBox(eateriesInRadius);
+
+
+        //updating stars on map
+        foodiePicks = eateriesInRadius.slice(0, 5);
+        stars = svgFoodiePicks.selectAll("image")
+          .data(foodiePicks)
+          .join("image")
+          .attr("class", "star-marker")
+          .attr("xlink:href", "./star.png")
+          .attr("x", -10)
+          .attr("y", -10)
+          .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
+          .attr("width", 20) // Adjust the width as needed
+          .attr("height", 20) // Adjust the height as needed
+          .on("mouseover", (d, i) => {
+            tooltip.style("visibility", "visible");
+
+            let eatery = i
+
+            //dynamically adjusts width, delete later
+            tooltipWidth = eatery['name'].length * 10
+            if (tooltipWidth < 200) { tooltipWidth = 200; }
+
+            box.attr("width", tooltipWidth)
+            txt.text(eatery['name']);
+            txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
+
+            tooltip
+              .raise();
+
+          })
+          .on("mouseout", (event) => {
+            tooltip.style("visibility", "hidden");
+          });
 
       }
 
@@ -1115,7 +1166,7 @@
             .appendChild(generateStars(d));
 
           const categories = d['search category'];
-          console.log(categories);
+          // console.log(categories);
           //JSON.parse(d.categories_json);
 
           // Append a div to contain individual spans for each search category
