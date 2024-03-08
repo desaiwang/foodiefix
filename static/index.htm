@@ -939,15 +939,12 @@
 
         histBars
           .attr("height", (d) => {
-            if (d.clicked) {
-              passedfilter = (d.filter(data => pointPassesFilters(data)));
-              d.filteredlength = yScale(passedfilter.length);
-            } else {
-              d.filteredlength = yScale(d.length);
-            }
-            return yScale(0) - d.filteredlength
+
+            passedfilter = (d.filter(data => filterCategory(data))); //the height reflects only categories
+            d.filteredlength = passedfilter.length;
+            return yScale(0) - yScale(Math.max(1, d.filteredlength)) //min is 1 to ensure that bar doesn't disappear
           })
-          .attr("y", d => d.filteredlength);
+          .attr("y", d => yScale(Math.max(1, d.filteredlength)));
 
       }
 
