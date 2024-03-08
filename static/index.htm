@@ -17,14 +17,10 @@
 
 
   <style>
-    * {
-      overflow-anchor: none;
-    }
-
     body {
       font-family: 'Barlow', 'Helvetica', sans-serif;
       font-weight: 400;
-      margin: 0 0 0 50px;
+      margin: 0 0 0 100px;
       padding: 0;
       min-width: 1400px;
       overflow-x: scroll;
@@ -85,25 +81,7 @@
       padding: 0 0 35 0;
     }
 
-    .flex-container {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: nowrap;
-    }
-
-    div.filterColumn {
-      margin: 0;
-      padding: 10px 10px 10px 30px;
-      min-width: 275px;
-      max-width: 275px;
-    }
-
-    div.filterButtonContainer {
-      height: calc(100vh - 170px);
-      overflow-y: scroll;
-    }
-
+    /* BUTTONS */
     button {
       font-family: 'Barlow', 'Helvetica', sans-serif;
       background-color: #ffffff;
@@ -170,17 +148,38 @@
       text-underline-offset: 3px;
     }
 
+    /* CONTAINERS */
+    .flex-container {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      flex-wrap: nowrap;
+    }
+
+    div.filterColumn {
+      margin: 0;
+      padding: 10px 35px 10px 0;
+      min-width: 300px;
+      max-width: 300px;
+    }
+
+    div.filterButtonContainer {
+      height: calc(100vh - 170px);
+      overflow-y: scroll;
+    }
+
     div.restaurant-list-info {
       max-width: 400px;
       min-width: 300px;
       margin: 0;
-      padding: 145px 20px 0 15px;
+      padding: 145px 20px 0 0;
     }
 
     .restaurant-list {
       height: calc(100vh - 240px);
       margin: 0;
-      padding: 5px 20px 10px 10px;
+      padding: 5px 35px 10px 10px;
       overflow-y: scroll;
     }
 
@@ -276,7 +275,9 @@
 
   <div class="flex-container">
 
-    <!-- FILTERS -->
+    <!--  ---------------
+              FILTERS 
+          --------------- -->
     <div class="filterColumn">
       <h1><img src="logo.png" width="35"> Foodie<span style="font-weight:400;">Fix</span></h1>
       <p id="tagline">Find the best restaurants near me</p>
@@ -326,14 +327,18 @@
       </div>
     </div>
 
-    <!-- LIST -->
+    <!--  ---------------
+                LIST 
+          --------------- -->    
     <div id="restaurantInfoBox" class="restaurant-list-info">
       <h2>RESTAURANTS NEAR ME</h2>
       <h3 id="best">FoodieFix Picks</h3>
       <div id="restaurantList" class="restaurant-list"></div>
     </div>
 
-    <!-- MAP -->
+    <!--  ---------------
+                MAP 
+          --------------- -->    
     <div class="mapColumn">
       <svg id="svgMap" width="650" height="1100">
         <defs>
