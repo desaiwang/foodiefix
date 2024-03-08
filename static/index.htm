@@ -201,11 +201,13 @@
       box-shadow: 0 0 7px #ccc;
     }
 
-    .restaurant-card div.categoryDivStyle {
+    .restaurant-card div.categoryDivStyle,
+    .restaurant-card-hover div.categoryDivStyle,
+    .best-restaurant-card-hover div.categoryDivStyle {
       margin: 6px 0 8px 0;
     }
 
-    .restaurant-card span.categoryStyle {
+    .restaurant-card-hover span.categoryStyle {
       margin: 2px 5px 2px 0;
       padding: 2px 6px 4px 6px;
       border: 1px solid #7339D0;
@@ -216,13 +218,29 @@
       border-radius: 11px;
     }
 
-    .restaurant-card p.snippetStyle {
+    .restaurant-card span.categoryStyle,
+    .best-restaurant-card-hover span.categoryStyle {
+      margin: 2px 5px 2px 0;
+      padding: 2px 6px 4px 6px;
+      border: 1px solid #C63186;
+      color: #C63186;
+      font-weight: 600;
+      font-size: .95em;
+      text-transform: lowercase;
+      border-radius: 11px;
+    }
+
+    .restaurant-card p.snippetStyle,
+    .restaurant-card-hover p.snippetStyle,
+    .best-restaurant-card-hover p.snippetStyle {
       margin: 5px 0 0 30px;
       text-indent: 0;
       font-style: italic;
     }
 
-    .restaurant-card p.snippetStyle::before {
+    .restaurant-card p.snippetStyle::before,
+    .restaurant-card-hover p.snippetStyle::before,
+    .best-restaurant-card-hover p.snippetStyle::before {
       content: url('snippet.svg');
       width: 24px;
       margin: 0 0 0 -28px;
@@ -231,6 +249,48 @@
       /* border: 1px solid red; */
     }
 
+    .restaurant-card-hover,
+    .best-restaurant-card-hover {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px 5px;
+      margin: 0 0 10px 0;
+      font-size: small;
+      box-shadow: 0 0 7px #ccc;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* 
+    .restaurant-card-hover div.categoryDivStyle {
+      margin: 6px 0 8px 0;
+    }
+
+    .restaurant-card-hover span.categoryStyle {
+      margin: 2px 5px 2px 0;
+      padding: 2px 6px 4px 6px;
+      border: 1px solid #7339D0;
+      color: #7339D0;
+      font-weight: 600;
+      font-size: .95em;
+      text-transform: lowercase;
+      border-radius: 11px;
+    }
+
+    .restaurant-card-hover p.snippetStyle {
+      margin: 5px 0 0 30px;
+      text-indent: 0;
+      font-style: italic;
+    }
+
+    .restaurant-card-hover p.snippetStyle::before {
+      content: url('snippet.svg');
+      width: 24px;
+      margin: 0 0 0 -28px;
+      padding: 0;
+      display: inline-block;
+      /* border: 1px solid red; 
+    } */
+
     .restaurant-name {
       font-size: 1.25em;
       font-weight: bold;
@@ -238,17 +298,30 @@
       padding: 0;
     }
 
-    .fa-star-o {
+    .fa-star-o.purple,
+    .fa.checked.purple,
+    .fa-star-half-full.purple {
       color: #7339D0
     }
 
-    .fa.checked {
+    .fa-star-o.pink,
+    .fa.checked.pink,
+    .fa-star-half-full.pink {
+      color: #C63186
+    }
+
+    /* .fa-star-o
+     {
       color: #7339D0
     }
 
-    .fa-star-half-full {
+    .fa.checked.purple {
       color: #7339D0
     }
+
+    .fa-star-half-full.purple {
+      color: #7339D0
+    } */
 
     div.mapColumn {
       overflow-x: scroll;
@@ -340,12 +413,8 @@
                 MAP 
           --------------- -->    
     <div class="mapColumn">
-      <svg id="svgMap" width="650" height="1100">
-        <defs>
-          <clipPath id="circleClip">
-            <circle cx="250" cy="250" r="200" />
-          </clipPath>
-        </defs>
+      <div id="restaurant-hover" class="restaurant-hover" style="position:absolute"></div>
+      <svg id="svgMap" width="650" height="1100" top="30">
       </svg>
     </div>
 
@@ -414,17 +483,17 @@
       let barPadding = 8;
       let svgHist = d3.select("#histogram");
 
-      xScale = d3
+      let xScale = d3
         .scaleLinear()
         .domain([bins[0].x0, bins[bins.length - 1].x1 + 0.5])
         .range([marginHist.left, widthHist - marginHist.right])
 
-      x = d3.scaleBand()
+      let x = d3.scaleBand()
         .domain([3.5, 4.0, 4.5, 5.0])
         .range([marginHist.left - barPadding * 1.5, widthHist - marginHist.right + barPadding * 2])
         .padding(0.3) //TODO: maybe set this instead of multiplying in Padding
 
-      yScale = d3
+      let yScale = d3
         .scaleSymlog()
         .domain([0, d3.max(bins, d => d.length)])
         .nice()
@@ -441,10 +510,9 @@
           )
       };
 
-      let ratinglist = [];
+      let ratinglist = []; //used to update ratings
 
       let histBars = svgHist
-        .append("g")
         .selectAll("rect")
         .data(bins)
         .join("rect")
@@ -731,74 +799,7 @@
       // let test = tooltip.append("g").attr("id", "stars");
 
       let svgEateries = svgMap.append("g");
-
-      //circles that represent eateries
-
-      let circles = svgEateries.selectAll("circle.eateries").data(eateries)
-        .join("circle")
-        .attr("class", "eateries")
-        .attr("r", 3)
-        .attr("fill", selectedColor)
-        .attr("opacity", 0.9)
-        .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
-        .on("mouseover", (d, i) => {
-          tooltip.style("visibility", "visible");
-
-          let eatery = i
-
-          //dynamically adjusts width, delete later
-          tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 200) { tooltipWidth = 200; }
-
-          box.attr("width", tooltipWidth)
-          txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
-
-          tooltip
-            .raise();
-
-        })
-        .on("mouseout", (event) => {
-          tooltip.style("visibility", "hidden");
-        });
-
-
-      //update best 3 markers
-      let foodiePicks = eateries.slice(0, 5);
-      let svgFoodiePicks = svgMap.append("g").attr("id", "foodie picks");
-
-      let stars = svgFoodiePicks.selectAll("image")
-        .data(foodiePicks)
-        .join("image")
-        .attr("class", "star-marker")
-        .attr("xlink:href", "./star.png")
-        .attr("x", -10)
-        .attr("y", -10)
-        .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
-        .attr("width", 20) // Adjust the width as needed
-        .attr("height", 20) // Adjust the height as needed
-        .on("mouseover", (d, i) => {
-          tooltip.style("visibility", "visible");
-
-          let eatery = i
-
-          //dynamically adjusts width, delete later
-          tooltipWidth = eatery['name'].length * 10
-          if (tooltipWidth < 200) { tooltipWidth = 200; }
-
-          box.attr("width", tooltipWidth)
-          txt.text(eatery['name']);
-          txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
-
-          tooltip
-            .raise();
-
-        })
-        .on("mouseout", (event) => {
-          tooltip.style("visibility", "hidden");
-        });
-
-
+      let svgFoodiePicks = svgMap.append("g");
 
       let myLocation = svgMap.selectAll("g.me").data([myCoordinates])
         .join("g")
@@ -848,7 +849,7 @@
 
       }
       var zoom = d3.zoom()
-        .scaleExtent([1 << 18.5, 1 << 25])
+        .scaleExtent([1 << 18.5, 1 << 26])
         .on("zoom", ({ transform }) => zoomed(transform));
 
       svgMap
@@ -884,9 +885,6 @@
         projection
           .scale(transform.k / (2 * Math.PI))
           .translate([transform.x, transform.y]);
-
-        circles
-          .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`);
 
         updateMyLocation();
       };
@@ -930,44 +928,34 @@
 
 
         // Draw the circles
-        circles = svgEateries.selectAll("circle.eateries").data(eateries)
+        svgEateries.selectAll("circle.eateries").data(eateries)
           .join("circle")
           .attr("class", "eateries")
-          .attr("r", 3)
           .attr("fill", (d) => {
             d.dist = getDistanceFromLatLonInMiles(myCoordinates.latitude, myCoordinates.longitude, d.latitude, d.longitude);
-            if (d.dist < filter_dist) {
+            d.inside = d.dist < filter_dist
+            if (d.inside) {
               return selectedColor
             }
             else { return greyedoutColor }
           })
+          .attr("r", 5)
+          .style("stroke", "white")
+          .attr("stroke-width", (d) => {
+            if (d.inside) { return "2px" }
+          })
           .attr("opacity", 0.9)
           .attr("transform", (d) => `translate(${projection([d.longitude, d.latitude])})`)
           .on("mouseover", (e, d) => {
-            tooltip.style("visibility", "visible");
-
-            //dynamically adjusts width, delete later
-            tooltipWidth = d['name'].length * 10
-            if (tooltipWidth < 200) { tooltipWidth = 200; }
-
-
-            box.attr("width", tooltipWidth)
-
-            txt.text(d['name']);
-            txt2.text(`Rating: ${d['rating']} (${d['review_count']} reviews)`)
-
-
-
-            tooltip
-              .raise();
-            // test.node().appendChild(generateStars(d)).raise();
+            // console.log("normal")
+            updateRestaurantHover([d], e.offsetX, e.offsetY, false)
 
           })
           .on("mouseout", (event) => {
-            // test.selectAll("*").remove()
-            tooltip.style("visibility", "hidden");
+            d3
+              .select('#restaurant-hover')
+              .selectAll("*").remove();
           });
-
 
 
         eateriesInRadius = eateries.filter(d => d.dist < filter_dist);
@@ -976,37 +964,36 @@
 
 
         //updating stars on map
-        foodiePicks = eateriesInRadius.slice(0, 5);
-        stars = svgFoodiePicks.selectAll("image")
-          .data(foodiePicks)
+        svgFoodiePicks.selectAll("image")
+          .data(eateriesInRadius.slice(0, 5)) //top 5 entires
           .join("image")
           .attr("class", "star-marker")
-          .attr("xlink:href", "./star.png")
+          .attr("xlink:href", "./star_pink.png")
           .attr("x", -10)
           .attr("y", -10)
           .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
           .attr("width", 20) // Adjust the width as needed
           .attr("height", 20) // Adjust the height as needed
-          .on("mouseover", (d, i) => {
-            tooltip.style("visibility", "visible");
-
-            let eatery = i
-
-            //dynamically adjusts width, delete later
-            tooltipWidth = eatery['name'].length * 10
-            if (tooltipWidth < 200) { tooltipWidth = 200; }
-
-            box.attr("width", tooltipWidth)
-            txt.text(eatery['name']);
-            txt2.text(`Rating: ${eatery['rating']} (${eatery['review_count']} reviews)`)
-
-            tooltip
-              .raise();
+          .on("mouseover", (e, d) => {
+            // console.log("best of best!")
+            updateRestaurantHover([d], e.offsetX, e.offsetY, true)
 
           })
           .on("mouseout", (event) => {
-            tooltip.style("visibility", "hidden");
+            d3
+              .select('#restaurant-hover')
+              .selectAll("*").remove();
           });
+
+
+        histBars
+          .attr("height", (d) => {
+
+            passedfilter = (d.filter(data => filterCategory(data))); //the height reflects only categories
+            d.filteredlength = passedfilter.length;
+            return yScale(0) - yScale(Math.max(1, d.filteredlength)) //min is 1 to ensure that bar doesn't disappear
+          })
+          .attr("y", d => yScale(Math.max(1, d.filteredlength)));
 
       }
 
@@ -1023,13 +1010,32 @@
       //same with mile1 button and all categories
       mi1.click();
       selectAllButton.click();
+      updateData();
 
     }
 
     requestMapData();
 
+    // ---------------
+    // HELPER FUNCTIONS
+    // ---------------
 
+    //makes sure element shows up withinbounds
+    function elementLocation(mouseX, mouseY, elementWidth, elementHeight, boundaryX, xMargin, yMargin) {
 
+      let xPos = mouseX + xMargin;
+      let yPos = mouseY - yMargin - elementHeight;
+
+      if ((xPos + elementWidth) > boundaryX) {
+        xPos = mouseX - xMargin - elementWidth
+      }
+      if (yPos < 0) {
+        yPos = mouseY - yMargin
+      }
+
+      return { x: xPos, y: yPos };
+
+    }
 
 
     function getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
@@ -1067,11 +1073,12 @@
       if (isHalf) {
         star.classList.add('half');
       }
+
       return star;
     }
 
-    // Function to generate stars
-    function generateStars(data) {
+    // Function to generate stars, can take either purple or pink as color
+    function generateStars(data, color) {
 
       let rating = data.rating;
 
@@ -1092,7 +1099,7 @@
         // div.appendChild(star);
 
         const star = document.createElement('span')
-        star.className = ("fa fa-star checked");
+        star.className = (`fa fa-star checked ${color}`);
         div.appendChild(star);
 
       }
@@ -1103,7 +1110,7 @@
         // div.appendChild(halfStar);
 
         const star = document.createElement('span')
-        star.className = ("fa fa-star-half-full");
+        star.className = (`fa fa-star-half-full ${color}`);
         div.appendChild(star);
       }
 
@@ -1114,7 +1121,7 @@
         // div.appendChild(star);
 
         const star = document.createElement('span')
-        star.className = ("fa fa-star-o");
+        star.className = (`fa fa-star-o ${color}`);
         div.appendChild(star);
       }
 
@@ -1168,7 +1175,7 @@
           d3.select(this)
             .append('div')
             .node()
-            .appendChild(generateStars(d));
+            .appendChild(generateStars(d, 'pink'));
 
           const categories = d['search category'];
           // console.log(categories);
@@ -1205,19 +1212,64 @@
         // Remove excess restaurant cards
         restaurantCards.exit().remove();
       }
+    }
 
 
+    function updateRestaurantHover(eateries, mouseX, mouseY, isBest) {
 
-      /** TODO: TO THINK ABOUT WHEN NEXT PICKUP
-       * [DONE] a scroll bar to contain the resturants
-       * [DONE] the category icons buttons!
-       * distance filter? 
-       * animation to smoothen transitions
-       * maybe switch the two buttons to a single toggle
-       * add the rating number next to the stars and the number of reviews in '()' next to the review number
-       * create an distinction between "best of best" and "all results"
-       * [DONE] add comment icon for the speech
-       * */
+      let restaurantListDiv = d3
+        .select('#restaurant-hover');
+
+
+      restaurantListDiv.selectAll("*").remove();
+
+      let cardClass = isBest ? 'best-restaurant-card-hover' : 'restaurant-card-hover';
+      let color = isBest ? 'pink' : 'purple';
+
+      // Bind data to restaurant cards
+      const newRestaurantCards = restaurantListDiv.selectAll('div')
+        .data(eateries)
+        .enter()
+        .append('div')
+        .attr('class', cardClass);
+
+      const anchorTags = newRestaurantCards
+        .style('text-decoration', 'none');
+
+      // Append individual spans for each search category within a div
+      anchorTags.each(function (d) {
+        d3.select(this)
+          .append('p')
+          .attr('class', 'restaurant-name')
+          .text(d => d.name);
+
+        d3.select(this)
+          .append('div')
+          .node()
+          .appendChild(generateStars(d, color));
+
+        const categories = d['search category'];
+
+        // Append a div to contain individual spans for each search category
+        const categoryDiv = d3.select(this)
+          .append('div')
+          .attr('class', 'categoryDivStyle');
+
+        // Append individual spans for each search category within the div
+        const categorySpans = categoryDiv.selectAll('.categorySpan') // Assuming you want to use a class for styling
+          .data(categories)
+          .enter()
+          .append('span')
+          .attr('class', 'categoryStyle') // Use appropriate class for styling
+          .text(category => category);
+
+      });
+
+      // console.log("width", anchorTags.node().offsetWidth)
+      // console.log("height", anchorTags.node().offsetHeight)
+      loc = elementLocation(mouseX, mouseY, anchorTags.node().offsetWidth, anchorTags.node().offsetHeight, width, 10, 10)
+
+      restaurantListDiv.style("transform", `translate(${loc.x}px, ${loc.y}px)`);
     }
 
   </script>
