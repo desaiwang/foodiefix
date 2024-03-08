@@ -1108,7 +1108,9 @@
             .node()
             .appendChild(generateStars(d));
 
-          const categories = JSON.parse(d.categories_json);
+          const categories = d['search category'];
+          console.log(categories);
+          //JSON.parse(d.categories_json);
 
           // Append a div to contain individual spans for each search category
           const categoryDiv = d3.select(this)
@@ -1121,7 +1123,7 @@
             .enter()
             .append('span')
             .attr('class', 'categoryStyle') // Use appropriate class for styling
-            .text(category => category[0]);
+            .text(category => category);
 
           const locationInfo = JSON.parse(d.location_json);
           d3.select(this)
