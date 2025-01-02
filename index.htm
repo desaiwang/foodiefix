@@ -25,7 +25,7 @@
               FILTERS 
           --------------- -->
     <div class="filterColumn">
-      <h1><img src="logo.png" width="35"> Foodie<span style="font-weight:400;">Fix</span></h1>
+      <h1><img src="./data/logo.png" width="35"> Foodie<span style="font-weight:400;">Fix</span></h1>
       <p id="tagline">Find the best restaurants near me</p>
 
       <h2>FILTERS</h2>
@@ -118,8 +118,8 @@
       let filter_dist = Infinity;
 
       //eatery data
-      // let eateriesAll = await d3.csv("./yelp_boston.csv", d3.autoType);
-      let eateriesAll = await d3.csv("./yelp_boston_clean.csv", d3.autoType);
+      // let eateriesAll = await d3.csv("./data/yelp_boston.csv", d3.autoType);
+      let eateriesAll = await d3.csv("./data/yelp_boston_clean.csv", d3.autoType);
 
       //parse search categories into proper list
       eateriesAll.forEach((d) => {
@@ -479,7 +479,7 @@
         .append("image")
         .attr('width', 25)
         .attr('height', 25)
-        .attr("xlink:href", './my_location_filled.png')
+        .attr("xlink:href", './data/my_location_filled.png')
         .attr("fill", "red")
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr("x", -12.5)  // Adjust x position to center the image
@@ -641,7 +641,7 @@
           .data(eateriesInRadius.slice(0, 5)) //top 5 entires
           .join("image")
           .attr("class", "star-marker")
-          .attr("xlink:href", "./star_pink.png")
+          .attr("xlink:href", "./data/star_pink.png")
           .attr("x", -10)
           .attr("y", -10)
           .attr("transform", d => `translate(${projection([d.longitude, d.latitude])})`)
